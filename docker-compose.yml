@@ -1,0 +1,32 @@
+# OpenObserve playground: a local OpenObserve for experiments and demos.
+#
+#   cp .env.example .env    # set a login
+#   make up                 # UI on http://localhost:5080
+#
+# Everything OpenObserve stores lives in ./data. Delete it to start from zero.
+name: openobserve-playground
+
+services:
+  openobserve:
+    # Enterprise build: free to self-host up to an ingestion limit (see README).
+    # Set O2_IMAGE in .env to use the open-source build or another version.
+    image: ${O2_IMAGE:-o2cr.ai/openobserve/openobserve-enterprise:v0.92.2}
+    container_name: openobserve
+    ports:
+      - "5080:5080"   # UI, REST API, OTLP/HTTP
+    env_file: .env
+    environment:
+      ZO_DATA_DIR: /data
+      # Accept events up to 10 years old (default: 5 hours). Needed to load history,
+      # e.g. a WHOOP backfill. Without it, old events are dropped with "Too old data".
+      ZO_INGEST_ALLOWED_UPTO: "87600"
+      # Let alert destinations point at private hosts such as host.docker.internal,
+      # so alerts can reach a service on your laptop.
+      # LOCAL USE ONLY. Remove this line on any server other people can reach.
+      ZO_SKIP_SSRF_CHECKS: "true"
+    volumes:
+      - ./data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    # No healthcheck here: the image has no shell or curl. `make health` checks from the host.

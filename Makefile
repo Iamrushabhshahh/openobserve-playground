@@ -11,6 +11,7 @@ help: ## Show targets
 up: .env ## Start OpenObserve and wait until it is healthy
 	docker compose up -d
 	@$(MAKE) -s health
+	@scripts/setup-service-discovery.sh
 
 down: ## Stop OpenObserve (data stays in ./data)
 	docker compose down

@@ -82,6 +82,8 @@ make down          stop (data stays)
 | Image | `openobserve-enterprise:v0.92.2` | Pinned, so a restart never upgrades your data by surprise. Change with `O2_IMAGE` in `.env`. |
 | `ZO_INGEST_ALLOWED_UPTO` | `87600` hours | The default (5 h) drops older events with "Too old data". Needed to load history such as a WHOOP backfill. |
 | `ZO_SKIP_SSRF_CHECKS` | `true` | Lets alerts call services on your laptop (`host.docker.internal`). **Local use only. Remove it on any server other people can reach.** |
+| `O2_SERVICE_STREAMS_ENABLED` | `true` | Service discovery links a service's logs, traces and metrics. Without it, a trace's **View Logs** opens an empty stream. `make up` adds a "local" identity set so laptop data (no Kubernetes/cloud fields) is discovered. |
+| `ZO_ENABLE_CROSS_LINKING` | `true` | Custom drill-down links on log and trace records. |
 | `ZO_TELEMETRY` | `false` (in `.env.example`) | No anonymous usage reports. |
 | Data | `./data` bind mount | Easy to back up, inspect or delete. |
 
@@ -116,6 +118,7 @@ Restore a backup with `make down && mv data data.old && tar -xzf backups/<file>.
 | Port 5080 is in use | Another OpenObserve runs. `docker ps`, then stop it, or change the port in `docker-compose.yml`. |
 | Login fails after changing `.env` | The login is stored in `./data` on first start. Change it in the UI, or `make reset`. |
 | "Too old data" when you ingest | `ZO_INGEST_ALLOWED_UPTO` is missing. Run `make restart` after you fix it. |
+| Trace → **View Logs** opens "Pick a stream" | Service discovery has not seen the service yet: wait up to 10 minutes after new data, or open the span's **Logs** tab. Check with `curl -u … localhost:5080/api/default/service_streams`. View Logs matches by service + time window; add `AND trace_id = '…'` for one trace. |
 | Log line has no "View Trace" button | Turn **More → Quick Mode** off in Logs. Quick Mode fetches only visible columns, so `trace_id` is missing. |
 | A dashboard shows 0 or old numbers | The UI caches panel results. Click the refresh button on the dashboard. |
 | Alert creation fails with "SSRF guard" | The destination is a private host and `ZO_SKIP_SSRF_CHECKS` is not set. |

@@ -24,6 +24,15 @@ services:
       # so alerts can reach a service on your laptop.
       # LOCAL USE ONLY. Remove this line on any server other people can reach.
       ZO_SKIP_SSRF_CHECKS: "true"
+      # Service discovery: links each service's logs, traces and metrics. Needed for the
+      # "View Logs" button on a trace (off by default; the button then opens an empty stream).
+      # Enterprise setting, hence the O2_ prefix.
+      O2_SERVICE_STREAMS_ENABLED: "true"
+      # A laptop sends little data, so look at every record. New services appear after the
+      # next discovery flush (every 10 minutes). `make up` also adds a "local" identity set.
+      O2_SERVICE_STREAMS_SAMPLE_RATE: "1"
+      # Custom drill-down links on log and trace records (stream/org "cross links").
+      ZO_ENABLE_CROSS_LINKING: "true"
     volumes:
       - ./data:/data
     extra_hosts:

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help up down restart logs status health backup reset claude-code version
+.PHONY: help up down restart logs status health backup reset claude-code claude-code-alerts alerts-log version
 
 help: ## Show targets
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -44,9 +44,16 @@ reset: ## DELETE all data and start empty (asks first)
 	rm -rf data
 	@$(MAKE) -s up
 
-claude-code: .env ## Send Claude Code telemetry here and import its dashboards
+claude-code: .env ## Send Claude Code telemetry here; import its dashboards and alerts
 	examples/claude-code/setup-claude-telemetry.sh
 	scripts/import-dashboards.sh examples/claude-code/dashboards/*.json
+	@echo "Alerts need the claude_code stream: run one Claude Code prompt, then: make claude-code-alerts"
+
+claude-code-alerts: .env ## Import the Claude Code alerts (after the first prompt has arrived)
+	scripts/import-alerts.sh examples/claude-code/alerts/*.json
+
+alerts-log: ## Follow alerts that OpenObserve sent to the alert-sink
+	docker compose logs -f alert-sink
 
 version: ## Show the image in use
 	@docker compose config --images

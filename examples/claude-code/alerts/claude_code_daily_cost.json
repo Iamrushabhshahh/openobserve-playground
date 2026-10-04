@@ -1,0 +1,33 @@
+{
+  "name": "claude_code_daily_cost",
+  "description": "Claude Code spend in the last 24 h is above 50 USD. Edit the number in the SQL to change the limit.",
+  "stream_type": "logs",
+  "stream_name": "claude_code",
+  "is_real_time": false,
+  "query_condition": {
+    "type": "sql",
+    "sql": "SELECT ROUND(SUM(cost_usd), 2) AS usd_24h FROM \"claude_code\" WHERE event_name = 'api_request' HAVING SUM(cost_usd) > 50",
+    "conditions": null,
+    "vrl_function": null
+  },
+  "trigger_condition": {
+    "period": 1440,
+    "operator": ">=",
+    "threshold": 1,
+    "frequency": 60,
+    "frequency_type": "minutes",
+    "silence": 720,
+    "cron": "",
+    "align_time": false
+  },
+  "destinations": [
+    "playground_alert_sink"
+  ],
+  "enabled": true,
+  "tz_offset": 0,
+  "row_template": "",
+  "tags": [
+    "claude-code"
+  ],
+  "creates_incident": false
+}

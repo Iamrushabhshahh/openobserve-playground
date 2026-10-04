@@ -5,7 +5,9 @@
 # Claude Code session ships traces, events and metrics to OpenObserve.
 #
 # Usage:
-#   ./setup-claude-telemetry.sh                 # local docker compose (http://localhost:5080, org "default")
+#   ./setup-claude-telemetry.sh                 # local playground (http://localhost:5080, org "default")
+#   CONTENT=1 ./setup-claude-telemetry.sh       # ALSO record prompt text, model responses, tool
+#                                               # inputs and tool output (off by default)
 #   O2_URL=https://api.openobserve.ai O2_ORG=my_org ./setup-claude-telemetry.sh   # OpenObserve Cloud
 #
 # Reads ZO_ROOT_USER_EMAIL / ZO_ROOT_USER_PASSWORD from .env (or the environment).
@@ -22,6 +24,11 @@ PASS="${ZO_ROOT_USER_PASSWORD:?set ZO_ROOT_USER_PASSWORD in .env}"
 
 TOKEN="$(printf '%s:%s' "$EMAIL" "$PASS" | base64 | tr -d '\n')"
 
+# Content capture is opt-in: prompts, responses, tool inputs (commands, file paths) and tool
+# output (file contents) end up in OpenObserve. Without it you still get every event, metric
+# and span, with the text redacted.
+if [ "${CONTENT:-0}" = "1" ]; then LOG_CONTENT=1; else LOG_CONTENT=0; fi
+
 # Endpoint is <host>/api/<org> with NO trailing slash; Claude Code appends /v1/{traces,logs,metrics}.
 read -r -d '' ENV_JSON <<EOF || true
 {
@@ -36,9 +43,12 @@ read -r -d '' ENV_JSON <<EOF || true
   "OTEL_TRACES_EXPORT_INTERVAL": "1000",
   "OTEL_LOGS_EXPORT_INTERVAL": "2000",
   "OTEL_METRIC_EXPORT_INTERVAL": "10000",
-  "OTEL_LOG_USER_PROMPTS": "1",
-  "OTEL_LOG_TOOL_DETAILS": "1",
-  "OTEL_LOG_TOOL_CONTENT": "1",
+  "OTEL_LOG_USER_PROMPTS": "${LOG_CONTENT}",
+  "OTEL_LOG_TOOL_DETAILS": "${LOG_CONTENT}",
+  "OTEL_LOG_TOOL_CONTENT": "${LOG_CONTENT}",
+  "OTEL_METRICS_INCLUDE_REPOSITORY": "true",
+  "OTEL_METRICS_INCLUDE_VERSION": "true",
+  "OTEL_METRICS_INCLUDE_ENTRYPOINT": "true",
   "OTEL_RESOURCE_ATTRIBUTES": "service.name=claude-code,deployment.environment=demo"
 }
 EOF
@@ -65,7 +75,8 @@ fi
 
 cat <<EOF
 
-Done. Start a new Claude Code session and run a prompt. Then in OpenObserve:
+Done (content capture: $([ "$LOG_CONTENT" = 1 ] && echo ON || echo off; true)).
+Start a new Claude Code session and run a prompt. Then in OpenObserve:
   Traces  -> stream "${O2_STREAM}"  : claude_code.interaction > llm_request / tool > blocked_on_user / execution
   Logs    -> stream "${O2_STREAM}"  : claude_code.user_prompt, api_request, tool_result, tool_decision ...
   Metrics -> claude_code_token_usage, claude_code_cost_usage, claude_code_active_time_total ...

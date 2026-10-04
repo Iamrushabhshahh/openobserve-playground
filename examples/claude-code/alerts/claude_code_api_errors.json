@@ -1,0 +1,33 @@
+{
+  "name": "claude_code_api_errors",
+  "description": "5 or more API errors or exhausted retries in 15 minutes.",
+  "stream_type": "logs",
+  "stream_name": "claude_code",
+  "is_real_time": false,
+  "query_condition": {
+    "type": "sql",
+    "sql": "SELECT COUNT(*) AS errors FROM \"claude_code\" WHERE event_name IN ('api_error', 'api_retries_exhausted') HAVING COUNT(*) >= 5",
+    "conditions": null,
+    "vrl_function": null
+  },
+  "trigger_condition": {
+    "period": 15,
+    "operator": ">=",
+    "threshold": 1,
+    "frequency": 15,
+    "frequency_type": "minutes",
+    "silence": 60,
+    "cron": "",
+    "align_time": false
+  },
+  "destinations": [
+    "playground_alert_sink"
+  ],
+  "enabled": true,
+  "tz_offset": 0,
+  "row_template": "",
+  "tags": [
+    "claude-code"
+  ],
+  "creates_incident": false
+}

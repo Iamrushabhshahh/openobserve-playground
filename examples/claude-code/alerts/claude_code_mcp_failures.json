@@ -1,0 +1,33 @@
+{
+  "name": "claude_code_mcp_failures",
+  "description": "An MCP server failed to connect 3 or more times in 30 minutes.",
+  "stream_type": "logs",
+  "stream_name": "claude_code",
+  "is_real_time": false,
+  "query_condition": {
+    "type": "sql",
+    "sql": "SELECT COALESCE(server_name, mcp_server_name, '(redacted)') AS server, COUNT(*) AS failures FROM \"claude_code\" WHERE event_name = 'mcp_server_connection' AND status = 'failed' GROUP BY 1 HAVING COUNT(*) >= 3",
+    "conditions": null,
+    "vrl_function": null
+  },
+  "trigger_condition": {
+    "period": 30,
+    "operator": ">=",
+    "threshold": 1,
+    "frequency": 30,
+    "frequency_type": "minutes",
+    "silence": 120,
+    "cron": "",
+    "align_time": false
+  },
+  "destinations": [
+    "playground_alert_sink"
+  ],
+  "enabled": true,
+  "tz_offset": 0,
+  "row_template": "",
+  "tags": [
+    "claude-code"
+  ],
+  "creates_incident": false
+}

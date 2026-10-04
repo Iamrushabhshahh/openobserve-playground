@@ -30,3 +30,29 @@ services:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
     # No healthcheck here: the image has no shell or curl. `make health` checks from the host.
+
+  # Receives alert notifications from OpenObserve and prints them.
+  # Watch with: docker compose logs -f alert-sink
+  alert-sink:
+    image: python:3.12-alpine
+    container_name: openobserve-alert-sink
+    command:
+      - python
+      - -u
+      - -c
+      - |
+        import json, http.server
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+                try:
+                    msg = json.loads(body)
+                    print(f"ALERT {msg.get('alert')}  stream={msg.get('stream')}  rows={msg.get('count')}  {msg.get('rows', '')[:300]}")
+                except ValueError:
+                    print("ALERT (raw)", body[:500].decode(errors="replace"))
+                self.send_response(204); self.end_headers()
+            def log_message(self, *args):
+                pass
+        print("alert-sink listening on :8080")
+        http.server.ThreadingHTTPServer(("0.0.0.0", 8080), H).serve_forever()
+    restart: unless-stopped

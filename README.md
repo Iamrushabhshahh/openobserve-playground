@@ -10,7 +10,7 @@ flowchart LR
   C["Claude Code<br/>(built-in OpenTelemetry)"] -->|"OTLP/HTTP"| O
   W["WHOOP collector<br/>(whoop-monitoring)"] -->|"JSON ingest + OTLP"| O
   Y["Your own app"] -.->|"OTLP / JSON / Prometheus"| O
-  O["OpenObserve :5080<br/>logs · metrics · traces<br/>dashboards · alerts"]
+  O["OpenObserve :5080<br/>logs · metrics · traces<br/>dashboards · alerts"] -->|"alert webhook"| S["alert-sink<br/>(prints alerts)"]
 ```
 
 ## Quick start
@@ -30,7 +30,7 @@ Open <http://localhost:5080> and log in with the values from `.env`.
 
 | Example | What you get | Start |
 |---|---|---|
-| [Claude Code](examples/claude-code/) | Every prompt, model call and tool call as traces, logs and metrics. Two dashboards: where agent time goes, and cost/token/tool usage. | `make claude-code` |
+| [Claude Code](examples/claude-code/) | Every prompt, model call and tool call as traces, logs and metrics. Three dashboards (Ops: latency, cache, tool failures, MCP health, cost per repo; traces; usage) and three alerts (daily cost, API errors, MCP failures). Content capture is opt-in. | `make claude-code` |
 | [WHOOP](examples/whoop/) | Recovery, HRV, sleep stages, strain, workouts. Four dashboards and five alerts. | See [examples/whoop](examples/whoop/) |
 
 <table>
@@ -70,6 +70,8 @@ make restart       apply changes to docker-compose.yml or .env
 make backup        stop, archive ./data into backups/, start
 make reset         delete ./data and start empty (asks first)
 make claude-code   send Claude Code telemetry here + import its dashboards
+make claude-code-alerts   import the Claude Code alerts (after the first prompt)
+make alerts-log    watch alerts arriving in the alert-sink container
 make down          stop (data stays)
 ```
 
@@ -114,6 +116,7 @@ Restore a backup with `make down && mv data data.old && tar -xzf backups/<file>.
 | Port 5080 is in use | Another OpenObserve runs. `docker ps`, then stop it, or change the port in `docker-compose.yml`. |
 | Login fails after changing `.env` | The login is stored in `./data` on first start. Change it in the UI, or `make reset`. |
 | "Too old data" when you ingest | `ZO_INGEST_ALLOWED_UPTO` is missing. Run `make restart` after you fix it. |
+| Log line has no "View Trace" button | Turn **More → Quick Mode** off in Logs. Quick Mode fetches only visible columns, so `trace_id` is missing. |
 | A dashboard shows 0 or old numbers | The UI caches panel results. Click the refresh button on the dashboard. |
 | Alert creation fails with "SSRF guard" | The destination is a private host and `ZO_SKIP_SSRF_CHECKS` is not set. |
 

@@ -55,9 +55,9 @@ The alert points at your own machine and `ZO_SKIP_SSRF_CHECKS` isn't set. See
 
 ### My OTLP/JSON request fails with "invalid type: map, expected f64"
 
-OpenObserve v0.92.2 doesn't accept decimal numbers (`doubleValue`) in OTLP sent as JSON. Use
+OpenObserve (checked on v0.92.2 and v1.0.4) doesn't accept decimal numbers (`doubleValue`) in OTLP sent as JSON. Use
 protobuf (what SDKs use by default), or send the number as text.
 
 ### The Trace Graph or the service graph's Tree View looks squashed
 
-That layout is buggy in this version. Use **Waterfall**, and the service graph's **Graph View**.
+That layout can break in some versions. Use **Waterfall**, and the service graph's **Graph View**.

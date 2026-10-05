@@ -10,7 +10,7 @@ services:
   openobserve:
     # Enterprise build: free to self-host up to an ingestion limit (see README).
     # Set O2_IMAGE in .env to use the open-source build or another version.
-    image: ${O2_IMAGE:-o2cr.ai/openobserve/openobserve-enterprise:v0.92.2}
+    image: ${O2_IMAGE:-o2cr.ai/openobserve/openobserve-enterprise:v1.0.4}
     container_name: openobserve
     ports:
       - "5080:5080"   # UI, REST API, OTLP/HTTP

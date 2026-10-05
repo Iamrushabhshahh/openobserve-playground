@@ -6,7 +6,7 @@ Everything here is already set up for you. This page is for when you want to kno
 
 | Setting | What it does | Why it's on |
 |---|---|---|
-| Image `openobserve-enterprise:v0.92.2` | The OpenObserve version | Pinned, so a restart never upgrades your data by surprise. |
+| Image `openobserve-enterprise:v1.0.4` | The OpenObserve version | Pinned, so a restart never upgrades your data by surprise. |
 | `O2_SERVICE_STREAMS_ENABLED=true` | Lets OpenObserve figure out which logs, traces and metrics belong to the same service | Without it, "View Logs" on a trace opens an empty page. |
 | `O2_SERVICE_STREAMS_SAMPLE_RATE=1` | Looks at every record, not a sample | A laptop sends little data, so sampling would miss things. |
 | `O2_SERVICE_GRAPH_PROCESSING_INTERVAL_SECS=60` | Rebuilds the service graph every minute | Otherwise you'd wait a long time to see it. |
@@ -27,7 +27,7 @@ uses a tiny fraction of that.
 Prefer the open-source build? Add this to `.env`, delete `./data`, and run `make restart`:
 
 ```bash
-O2_IMAGE=public.ecr.aws/zinclabs/openobserve:v0.92.2
+O2_IMAGE=public.ecr.aws/zinclabs/openobserve:v1.0.4
 ```
 
 Traces, logs and metrics all work. A few of the links between them won't.
@@ -64,6 +64,10 @@ Then look in **Logs → stream `hello`**.
 | Prometheus remote write | `http://localhost:5080/api/default/prometheus/api/v1/write` |
 
 ## Upgrade
+
+Always try a new version on a **copy** of your data first. That's how this playground moved
+from v0.92.2 to v1.0.4: the data upgraded itself on first start (database schema 64 → 77), and
+every stream, dashboard and alert came through.
 
 ```bash
 make backup                                                                     # save a copy first

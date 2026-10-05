@@ -5,16 +5,16 @@
 # Claude Code session ships traces, events and metrics to OpenObserve.
 #
 # Usage:
-#   ./setup-claude-telemetry.sh                 # local playground (http://localhost:5080, org "default")
-#   CONTENT=1 ./setup-claude-telemetry.sh       # ALSO record prompt text, model responses, tool
+#   claude-code/connect.sh                 # local playground (http://localhost:5080, org "default")
+#   CONTENT=1 claude-code/connect.sh       # ALSO record prompt text, model responses, tool
 #                                               # inputs and tool output (off by default)
-#   O2_URL=https://api.openobserve.ai O2_ORG=my_org ./setup-claude-telemetry.sh   # OpenObserve Cloud
+#   O2_URL=https://api.openobserve.ai O2_ORG=my_org claude-code/connect.sh   # OpenObserve Cloud
 #
 # Reads ZO_ROOT_USER_EMAIL / ZO_ROOT_USER_PASSWORD from .env (or the environment).
 set -euo pipefail
 
-here="$(cd "$(dirname "$0")" && pwd)"
-[ -f "$here/.env" ] && set -a && . "$here/.env" && set +a
+root="$(cd "$(dirname "$0")/.." && pwd)"   # repo root, where .env lives
+[ -f "$root/.env" ] && set -a && . "$root/.env" && set +a
 
 O2_URL="${O2_URL:-http://localhost:5080}"
 O2_ORG="${O2_ORG:-default}"

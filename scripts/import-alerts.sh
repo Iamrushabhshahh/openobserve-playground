@@ -2,7 +2,7 @@
 # Create the alert template + destination (the local alert-sink service), then import alert
 # JSON files. Skips alerts whose name already exists.
 #
-#   scripts/import-alerts.sh examples/claude-code/alerts/*.json
+#   scripts/import-alerts.sh claude-code/alerts/*.json
 #
 # Alerts post to ALERT_URL (default: the alert-sink container). Watch them with:
 #   docker compose logs -f alert-sink

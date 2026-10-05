@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Import dashboard JSON files into OpenObserve. Skips a dashboard whose title already exists.
 #
-#   scripts/import-dashboards.sh examples/claude-code/dashboards/*.json
+#   scripts/import-dashboards.sh claude-code/dashboards/*.json
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")/.." && pwd)"

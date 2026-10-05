@@ -5,9 +5,9 @@ Lets you explore OpenObserve tracing without running Claude Code. The data has t
 shape as real Claude Code telemetry (span names, attributes, event logs), so the Claude
 Code dashboards and the log <-> trace links work on it.
 
-    python3 scripts/demo-agent-traces.py                 # 6 hours of history, ~30 tasks
-    python3 scripts/demo-agent-traces.py --live          # then keep emitting a task every ~20 s
-    python3 scripts/demo-agent-traces.py --hours 24 --tasks 80
+    python3 demo/generate-agent-traces.py                 # 6 hours of history, ~30 tasks
+    python3 demo/generate-agent-traces.py --live          # then keep emitting a task every ~20 s
+    python3 demo/generate-agent-traces.py --hours 24 --tasks 80
 
 What one task looks like (one trace):
 

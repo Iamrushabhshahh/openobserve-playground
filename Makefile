@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help up down restart logs status health backup reset claude-code claude-code-alerts alerts-log version
+.PHONY: help up down restart logs status health backup reset demo demo-live claude-code claude-code-alerts alerts-log version
 
 help: ## Show targets
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -44,6 +44,14 @@ reset: ## DELETE all data and start empty (asks first)
 	docker compose down
 	rm -rf data
 	@$(MAKE) -s up
+
+demo: .env ## Load 6 h of synthetic agent traces + logs + metrics, import Claude Code dashboards
+	python3 scripts/demo-agent-traces.py
+	scripts/import-dashboards.sh examples/claude-code/dashboards/*.json
+	@echo "Open http://localhost:5080 -> Traces -> stream claude_code"
+
+demo-live: .env ## Keep generating a synthetic agent task every ~20 s (Ctrl+C to stop)
+	python3 scripts/demo-agent-traces.py --hours 0.5 --tasks 5 --live
 
 claude-code: .env ## Send Claude Code telemetry here; import its dashboards and alerts
 	examples/claude-code/setup-claude-telemetry.sh

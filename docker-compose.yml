@@ -31,6 +31,9 @@ services:
       # A laptop sends little data, so look at every record. New services appear after the
       # next discovery flush (every 10 minutes). `make up` also adds a "local" identity set.
       O2_SERVICE_STREAMS_SAMPLE_RATE: "1"
+      # Build the service graph (Traces -> Service Graph) every minute instead of waiting
+      # for the default interval, so a new playground shows it quickly.
+      O2_SERVICE_GRAPH_PROCESSING_INTERVAL_SECS: "60"
       # Custom drill-down links on log and trace records (stream/org "cross links").
       ZO_ENABLE_CROSS_LINKING: "true"
     volumes:

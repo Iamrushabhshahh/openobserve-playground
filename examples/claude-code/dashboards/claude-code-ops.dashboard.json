@@ -1554,8 +1554,8 @@
         {
           "id": "Panel_ID0015",
           "type": "table",
-          "title": "MCP failures by server",
-          "description": "",
+          "title": "MCP connection failures",
+          "description": "Grouped by transport, scope and error code (always sent). Server names need OTEL_LOG_TOOL_DETAILS=1.",
           "config": {
             "show_legends": true,
             "legends_position": "bottom",
@@ -1595,20 +1595,13 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT COALESCE(server_name, mcp_server_name, '(redacted)') AS server, transport_type, COUNT(*) AS failures, MAX(error_code) AS last_error_code FROM \"claude_code\" WHERE event_name = 'mcp_server_connection' AND status = 'failed' GROUP BY 1, 2 ORDER BY failures DESC LIMIT 20",
+              "query": "SELECT transport_type, server_scope, COALESCE(error_code, '(none)') AS error_code, COUNT(*) AS failures FROM \"claude_code\" WHERE event_name = 'mcp_server_connection' AND status = 'failed' GROUP BY 1, 2, 3 ORDER BY failures DESC LIMIT 20",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
                 "stream": "claude_code",
                 "stream_type": "logs",
                 "x": [
-                  {
-                    "label": "Server",
-                    "alias": "server",
-                    "column": "server",
-                    "color": null,
-                    "isDerived": false
-                  },
                   {
                     "label": "Transport",
                     "alias": "transport_type",
@@ -1617,9 +1610,16 @@
                     "isDerived": false
                   },
                   {
+                    "label": "Scope",
+                    "alias": "server_scope",
+                    "column": "server_scope",
+                    "color": null,
+                    "isDerived": false
+                  },
+                  {
                     "label": "Error",
-                    "alias": "last_error_code",
-                    "column": "last_error_code",
+                    "alias": "error_code",
+                    "column": "error_code",
                     "color": null,
                     "isDerived": false
                   }

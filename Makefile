@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help up down restart logs status health backup reset demo demo-live claude-code claude-code-alerts alerts-log version
+.PHONY: help up down restart logs status health backup reset clean-images demo demo-live claude-code claude-code-alerts alerts-log version
 
 help: ## List these commands
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-19s\033[0m %s\n", $$1, $$2}'
@@ -25,7 +25,7 @@ logs: ## Show OpenObserve's own logs
 
 status: ## Is it running? Which version? How much data?
 	@docker compose ps
-	@curl -s localhost:5080/config | python3 -c "import json,sys;d=json.load(sys.stdin);print('version:',d['version'],d['build_type'])" 2>/dev/null || echo "version: (not running)"
+	@docker exec openobserve /openobserve --version 2>/dev/null || echo "openobserve: not running"
 	@du -sh data 2>/dev/null || true
 
 health: ## Wait until OpenObserve answers
@@ -64,5 +64,13 @@ claude-code-alerts: .env ## Add the Claude Code alerts (after your first prompt)
 alerts-log: ## Watch alerts as they arrive
 	docker compose logs -f alert-sink
 
-version: ## Show which OpenObserve image is used
-	@docker compose config --images
+version: ## Show which OpenObserve version and image are used
+	@docker exec openobserve /openobserve --version 2>/dev/null || echo "openobserve: not running"
+	@docker compose config --images | grep -i openobserve
+
+clean-images: ## Remove OpenObserve images no container uses (asks first)
+	@used="$$(docker ps -a --format '{{.Image}}' | sort -u)"; \
+	unused="$$(docker images --format '{{.Repository}}:{{.Tag}}' | grep -i openobserve | grep -vxF "$$used" || true)"; \
+	if [ -z "$$unused" ]; then echo "No unused OpenObserve images."; exit 0; fi; \
+	echo "Not used by any container:"; echo "$$unused" | sed 's/^/  /'; \
+	read -p "Remove these? [y/N] " a; [ "$$a" = y ] && echo "$$unused" | xargs docker rmi || echo "Kept."

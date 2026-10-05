@@ -65,15 +65,46 @@ Then look in **Logs → stream `hello`**.
 
 ## Upgrade
 
-Always try a new version on a **copy** of your data first. That's how this playground moved
-from v0.92.2 to v1.0.4: the data upgraded itself on first start (database schema 64 → 77), and
-every stream, dashboard and alert came through.
+New OpenObserve versions come out often. Here's the safe way to move to one.
+
+**1. See what you're on, and what's new.**
 
 ```bash
-make backup                                                                     # save a copy first
+make version                                                     # e.g. "openobserve v1.0.4"
+docker pull o2cr.ai/openobserve/openobserve-enterprise:latest
+docker run --rm --entrypoint /openobserve o2cr.ai/openobserve/openobserve-enterprise:latest --version
+```
+
+**2. Save a copy of your data.**
+
+```bash
+make backup                  # writes backups/o2-data-<date>.tgz
+```
+
+**3. Try the new version on that copy first** (optional, but worth it for a big jump). Unpack
+the backup in a second folder of this repo, give it another port in a
+`docker-compose.override.yml`, start it, and click around. Your real instance keeps running.
+
+**4. Switch.** Put the exact version in `.env` (not `latest`, so it never changes by surprise):
+
+```bash
 echo 'O2_IMAGE=o2cr.ai/openobserve/openobserve-enterprise:<new-version>' >> .env
 make restart
+make version                 # check it took
 ```
+
+OpenObserve upgrades its database by itself on first start. If something's wrong, remove the
+`O2_IMAGE` line, restore the backup (below) and `make restart`.
+
+**5. Tidy up** once you're happy:
+
+```bash
+make clean-images            # lists old OpenObserve images and asks before removing them
+rm backups/o2-data-<date>.tgz
+```
+
+That's exactly how this playground went from v0.92.2 to v1.0.4: the database upgraded itself
+(schema 64 → 77), and every stream, dashboard and alert came through.
 
 ## Back up and restore
 
@@ -81,7 +112,8 @@ make restart
 make backup          # writes backups/o2-data-<date>.tgz
 ```
 
-To restore: `make down`, move `data` out of the way, unpack the backup, `make up`.
+To restore: `make down`, move `data` out of the way (`mv data data.old`), unpack the backup
+(`tar -xzf backups/o2-data-<date>.tgz`), then `make up`.
 
 ## All the commands
 
@@ -93,6 +125,8 @@ make claude-code         connect your real Claude Code + import its dashboards
 make claude-code-alerts  add the Claude Code alerts (after your first prompt)
 make alerts-log          watch alerts arrive
 make status / logs       check on OpenObserve
+make version             which OpenObserve version is running
+make clean-images        remove old OpenObserve images (asks first)
 make restart             apply changes to docker-compose.yml or .env
 make backup / reset      save a copy / delete everything
 make down                stop

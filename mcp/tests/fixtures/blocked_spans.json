@@ -1,0 +1,10 @@
+[
+  {"span_id": "b1", "reference_parent_span_id": "p1", "tool_name": "", "decision": "accept", "source": "user_temporary", "duration": 4000000},
+  {"span_id": "b2", "reference_parent_span_id": "p2", "decision": "accept", "source": "user_temporary", "duration": 2000000},
+  {"span_id": "b3", "reference_parent_span_id": "p3", "decision": "accept", "source": "user_temporary", "duration": 1000000},
+  {"span_id": "b4", "reference_parent_span_id": "p4", "decision": "accept", "source": "user_temporary", "duration": 1000000},
+  {"span_id": "b5", "reference_parent_span_id": "p5", "decision": "accept", "source": "user_temporary", "duration": 2000000},
+  {"span_id": "b6", "reference_parent_span_id": "p6", "tool_name": "Edit", "decision": "accept", "source": "config", "duration": 1000},
+  {"span_id": "b7", "reference_parent_span_id": "p7", "tool_name": "Edit", "decision": "reject", "source": "user_abort", "duration": 30000000},
+  {"span_id": "b8", "reference_parent_span_id": "missing", "decision": "unknown", "source": "unknown", "duration": 500000}
+]

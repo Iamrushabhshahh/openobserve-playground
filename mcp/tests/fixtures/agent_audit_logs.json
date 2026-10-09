@@ -1,0 +1,48 @@
+[
+ {
+  "_timestamp": 1791400001000000,
+  "event_name": "user_prompt",
+  "trace_id": "tr-1"
+ },
+ {
+  "_timestamp": 1791400002000000,
+  "event_name": "mcp_server_connection",
+  "server_name": "github",
+  "status": "connected"
+ },
+ {
+  "_timestamp": 1791400003000000,
+  "event_name": "tool_decision",
+  "tool_name": "Bash",
+  "decision": "accept",
+  "source": "user_temporary",
+  "trace_id": "tr-1"
+ },
+ {
+  "_timestamp": 1791400009000000,
+  "event_name": "tool_result",
+  "tool_name": "Bash",
+  "success": "true",
+  "trace_id": "tr-1"
+ },
+ {
+  "_timestamp": 1791400010000000,
+  "event_name": "permission_mode_changed",
+  "mode": "bypassPermissions"
+ },
+ {
+  "_timestamp": 1791400012000000,
+  "event_name": "tool_decision",
+  "tool_name": "Bash",
+  "decision": "reject",
+  "source": "user_reject",
+  "trace_id": "tr-2"
+ },
+ {
+  "_timestamp": 1791400015000000,
+  "event_name": "api_error",
+  "model": "claude-opus",
+  "status_code": "529",
+  "trace_id": "tr-2"
+ }
+]

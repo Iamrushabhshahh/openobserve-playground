@@ -1,0 +1,16 @@
+{
+  "took": 12, "total": 2, "from": 0, "size": 20,
+  "hits": [
+    {"trace_id": "t-slow", "start_time": 1791457200000000000, "end_time": 1791457202500000000,
+     "duration": 2500000, "spans": [14, 2],
+     "service_name": [{"service_name": "api", "count": 14, "duration": 2500000}],
+     "first_event": {"service_name": "api", "operation_name": "GET /orders"},
+     "gen_ai_usage_input_tokens": 0, "gen_ai_usage_output_tokens": 0, "gen_ai_usage_total_tokens": 0,
+     "gen_ai_usage_cost": 0.0, "gen_ai_input_messages": "secret prompt", "models": []},
+    {"trace_id": "t-fast", "start_time": 1791457100000000000, "end_time": 1791457100100000000,
+     "duration": 100000, "spans": [3, 0], "service_name": [],
+     "first_event": {"service_name": "web", "operation_name": "GET /"},
+     "gen_ai_usage_input_tokens": 0, "gen_ai_usage_output_tokens": 0, "gen_ai_usage_total_tokens": 0,
+     "gen_ai_usage_cost": 0.0, "models": []}
+  ]
+}

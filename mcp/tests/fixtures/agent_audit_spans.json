@@ -1,0 +1,65 @@
+[
+ {
+  "start_time": 1791400003000000000,
+  "trace_id": "tr-1",
+  "span_id": "a1",
+  "reference_parent_span_id": "i1",
+  "operation_name": "claude_code.tool",
+  "tool_name": "Bash",
+  "bash_command_class": "network",
+  "bash_argv0": "curl"
+ },
+ {
+  "start_time": 1791400003100000000,
+  "trace_id": "tr-1",
+  "span_id": "a1b",
+  "reference_parent_span_id": "a1",
+  "operation_name": "claude_code.tool.blocked_on_user",
+  "decision": "accept",
+  "source": "user_temporary"
+ },
+ {
+  "start_time": 1791400005000000000,
+  "trace_id": "tr-1",
+  "span_id": "a1e",
+  "reference_parent_span_id": "a1",
+  "operation_name": "claude_code.tool.execution",
+  "success": "true"
+ },
+ {
+  "start_time": 1791400012000000000,
+  "trace_id": "tr-2",
+  "span_id": "a2",
+  "reference_parent_span_id": "i2",
+  "operation_name": "claude_code.tool",
+  "tool_name": "Bash",
+  "bash_command_class": "other",
+  "bash_argv0": "rm"
+ },
+ {
+  "start_time": 1791400012100000000,
+  "trace_id": "tr-2",
+  "span_id": "a2b",
+  "reference_parent_span_id": "a2",
+  "operation_name": "claude_code.tool.blocked_on_user",
+  "decision": "reject",
+  "source": "user_reject"
+ },
+ {
+  "start_time": 1791400013000000000,
+  "trace_id": "tr-2",
+  "span_id": "a3",
+  "reference_parent_span_id": "i2",
+  "operation_name": "claude_code.tool",
+  "tool_name": "Edit"
+ },
+ {
+  "start_time": 1791400013500000000,
+  "trace_id": "tr-2",
+  "span_id": "a3e",
+  "reference_parent_span_id": "a3",
+  "operation_name": "claude_code.tool.execution",
+  "success": "false",
+  "error_class": "Error:ENOENT"
+ }
+]

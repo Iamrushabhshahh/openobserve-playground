@@ -1,0 +1,95 @@
+[
+ {
+  "trace_id": "abc123",
+  "span_id": "s0",
+  "reference_parent_span_id": "",
+  "operation_name": "claude_code.interaction",
+  "start_time": 1700000000000000000,
+  "end_time": 1700000010000000000,
+  "duration": 10000000,
+  "session_id": "sess-1"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "l1",
+  "reference_parent_span_id": "s0",
+  "operation_name": "claude_code.llm_request",
+  "start_time": 1700000000000000000,
+  "end_time": 1700000002000000000,
+  "duration": 2000000,
+  "model": "claude-opus",
+  "input_tokens": "100",
+  "output_tokens": "50",
+  "cache_read_tokens": "1000",
+  "cache_creation_tokens": "0"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "t1",
+  "reference_parent_span_id": "s0",
+  "operation_name": "claude_code.tool",
+  "start_time": 1700000002000000000,
+  "end_time": 1700000006000000000,
+  "duration": 4000000,
+  "tool_name": "Bash"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "b1",
+  "reference_parent_span_id": "t1",
+  "operation_name": "claude_code.tool.blocked_on_user",
+  "start_time": 1700000002000000000,
+  "end_time": 1700000003000000000,
+  "duration": 1000000,
+  "decision": "accept",
+  "source": "user_temporary"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "e1",
+  "reference_parent_span_id": "t1",
+  "operation_name": "claude_code.tool.execution",
+  "start_time": 1700000003000000000,
+  "end_time": 1700000006000000000,
+  "duration": 3000000,
+  "success": "true"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "t2",
+  "reference_parent_span_id": "s0",
+  "operation_name": "claude_code.tool",
+  "start_time": 1700000006000000000,
+  "end_time": 1700000010600000000,
+  "duration": 4600000,
+  "tool_name": "Task"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "l2",
+  "reference_parent_span_id": "t2",
+  "operation_name": "claude_code.llm_request",
+  "start_time": 1700000006000000000,
+  "end_time": 1700000008000000000,
+  "duration": 2000000,
+  "model": "claude-haiku",
+  "agent_id": "a1",
+  "parent_agent_id": "main",
+  "input_tokens": "10",
+  "output_tokens": "5"
+ },
+ {
+  "trace_id": "abc123",
+  "span_id": "l3",
+  "reference_parent_span_id": "t2",
+  "operation_name": "claude_code.llm_request",
+  "start_time": 1700000008000000000,
+  "end_time": 1700000010500000000,
+  "duration": 2500000,
+  "model": "claude-haiku",
+  "agent_id": "a1",
+  "parent_agent_id": "main",
+  "input_tokens": 20,
+  "output_tokens": 5
+ }
+]

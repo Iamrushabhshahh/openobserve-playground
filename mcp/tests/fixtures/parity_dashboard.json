@@ -1,0 +1,18 @@
+{
+  "version": 8, "hash": "h", "updated_at": 1,
+  "v8": {
+    "version": 8, "dashboardId": "ops", "title": "Ops", "description": "Latency and errors",
+    "role": "", "owner": "me", "created": "2026-10-04T21:42:35Z",
+    "tabs": [
+      {"tabId": "default", "name": "Default", "panels": [
+        {"id": "P1", "type": "line", "title": "p95 latency", "description": "", "config": {},
+         "queryType": "sql",
+         "queries": [{"query": "SELECT histogram(_timestamp) AS t, approx_percentile_cont(duration, 0.95) FROM \"default\" GROUP BY t",
+                      "customQuery": true, "fields": {"stream": "default", "stream_type": "traces"}, "config": {}}]},
+        {"id": "P2", "type": "metric", "title": "Up", "description": "", "config": {},
+         "queryType": "promql",
+         "queries": [{"query": "up", "customQuery": true, "fields": {"stream": "up", "stream_type": "metrics"}, "config": {}}]}
+      ]}
+    ]
+  }
+}

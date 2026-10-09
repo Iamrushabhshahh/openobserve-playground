@@ -1,0 +1,32 @@
+{
+  "list": [
+    {
+      "name": "claude_code_cost_usage",
+      "storage_type": "disk",
+      "stream_type": "metrics",
+      "stats": {"created_at": 1791000000000000, "doc_time_min": 1791000000000000, "doc_time_max": 1791460200000000, "doc_num": 1200, "file_num": 4, "storage_size": 0.5, "compressed_size": 0.1, "index_size": 0.0},
+      "schema": [],
+      "settings": {},
+      "total_fields": 12
+    },
+    {
+      "name": "claude_code_token_usage",
+      "storage_type": "disk",
+      "stream_type": "metrics",
+      "stats": {"created_at": 1791000000000000, "doc_time_min": 1791000000000000, "doc_time_max": 1791450000000000, "doc_num": 900, "file_num": 3, "storage_size": 0.4, "compressed_size": 0.1, "index_size": 0.0},
+      "schema": [],
+      "settings": {},
+      "total_fields": 12
+    },
+    {
+      "name": "node_cpu_seconds_total",
+      "storage_type": "disk",
+      "stream_type": "metrics",
+      "stats": {"created_at": 1791000000000000, "doc_time_min": 1791000000000000, "doc_time_max": 1791460700000000, "doc_num": 50000, "file_num": 9, "storage_size": 9.0, "compressed_size": 2.0, "index_size": 0.0},
+      "schema": [],
+      "settings": {},
+      "total_fields": 8
+    }
+  ],
+  "total": 3
+}

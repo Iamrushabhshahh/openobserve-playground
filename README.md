@@ -61,6 +61,16 @@ There's a full guided tour, with the queries behind each view, in
 | Track my WHOOP recovery, sleep and strain | Follow [whoop/](whoop/) |
 | Send traces from my own app | Point any OpenTelemetry SDK at `http://localhost:5080/api/default`. [How →](docs/settings.md#send-your-own-data) |
 
+## Ask Claude about your data
+
+[`mcp/`](mcp/) is an MCP server with 40 tools for investigating AI coding agents the way an
+SRE investigates a service. Claude Code can answer questions like "where did the time go in my
+slowest session?", "is the agent stuck in a loop?", "are we burning our error budget?", "when
+will we hit our monthly budget?" or "what did the agent run in this session?" straight from
+OpenObserve, without writing SQL. It covers the read paths of OpenObserve's built-in MCP
+and adds what that one lacks. Setup and the full tool list are in
+**[mcp/README.md](mcp/README.md)**.
+
 ## Everyday commands
 
 ```text

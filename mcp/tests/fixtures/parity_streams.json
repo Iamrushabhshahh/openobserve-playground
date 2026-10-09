@@ -1,0 +1,13 @@
+{
+  "list": [
+    {"name": "small", "storage_type": "disk", "stream_type": "logs", "total_fields": 4,
+     "stats": {"created_at": 1, "doc_time_min": 1, "doc_time_max": 2, "doc_num": 10, "file_num": 1,
+               "storage_size": 0.5, "compressed_size": 0.1, "index_size": 0.0},
+     "schema": [], "settings": {}},
+    {"name": "default", "storage_type": "disk", "stream_type": "traces", "total_fields": 40,
+     "stats": {"created_at": 1, "doc_time_min": 1, "doc_time_max": 2, "doc_num": 12345, "file_num": 3,
+               "storage_size": 12.3456, "compressed_size": 1.2, "index_size": 0.0},
+     "schema": [], "settings": {}}
+  ],
+  "total": 2
+}

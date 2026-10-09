@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help up down restart logs status health backup reset clean-images demo demo-live claude-code claude-code-alerts alerts-log version
+.PHONY: help up down restart logs status health backup reset clean-images demo demo-live claude-code claude-code-alerts alerts-log version mcp-test mcp-smoke
 
 help: ## List these commands
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-19s\033[0m %s\n", $$1, $$2}'
@@ -74,3 +74,18 @@ clean-images: ## Remove OpenObserve images no container uses (asks first)
 	if [ -z "$$unused" ]; then echo "No unused OpenObserve images."; exit 0; fi; \
 	echo "Not used by any container:"; echo "$$unused" | sed 's/^/  /'; \
 	read -p "Remove these? [y/N] " a; [ "$$a" = y ] && echo "$$unused" | xargs docker rmi || echo "Kept."
+
+MCP_VENV := mcp/.venv/.installed
+
+$(MCP_VENV): mcp/pyproject.toml
+	python3 -m venv mcp/.venv
+	mcp/.venv/bin/pip install -q -e ./mcp pytest
+	@touch $@
+
+mcp-test: ## Run the agent-obs MCP server's offline tests
+	@if command -v uv >/dev/null; then cd mcp && uv run pytest; \
+	else $(MAKE) -s $(MCP_VENV) && cd mcp && .venv/bin/python -m pytest; fi
+
+mcp-smoke: .env ## Call every agent-obs MCP tool against the running OpenObserve
+	@if command -v uv >/dev/null; then cd mcp && uv run python scripts/smoke.py; \
+	else $(MAKE) -s $(MCP_VENV) && cd mcp && .venv/bin/python scripts/smoke.py; fi

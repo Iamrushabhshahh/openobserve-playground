@@ -11,9 +11,9 @@ services:
     # Enterprise build: free to self-host up to an ingestion limit (see README).
     # Set O2_IMAGE in .env to use the open-source build or another version.
     image: ${O2_IMAGE:-o2cr.ai/openobserve/openobserve-enterprise:v1.0.4}
-    container_name: openobserve
+    container_name: ${O2_CONTAINER:-openobserve}
     ports:
-      - "5080:5080"   # UI, REST API, OTLP/HTTP
+      - "${O2_PORT:-5080}:5080"   # UI, REST API, OTLP/HTTP (change O2_PORT in .env if 5080 is taken)
     env_file: .env
     environment:
       ZO_DATA_DIR: /data
@@ -47,7 +47,7 @@ services:
   # Watch with: docker compose logs -f alert-sink
   alert-sink:
     image: python:3.12-alpine
-    container_name: openobserve-alert-sink
+    container_name: ${O2_CONTAINER:-openobserve}-alert-sink
     command:
       - python
       - -u

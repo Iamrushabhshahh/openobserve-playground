@@ -14,8 +14,8 @@ Change the password in the UI (**IAM → Users**), or run `make reset` to start 
 
 ### Port 5080 is already in use
 
-Another OpenObserve is probably running. Find it with `docker ps` and stop it, or change the
-port in `docker-compose.yml`.
+Another OpenObserve (or another app) is probably using it. `make doctor` tells you. Either
+stop it, or set `O2_PORT=5090` and `O2_CONTAINER=openobserve-2` in `.env`, then `make up`.
 
 ### I don't see a "View Trace" button on a log line
 

@@ -410,7 +410,7 @@ def main() -> None:
     if not email or not password:
         sys.exit("Set ZO_ROOT_USER_EMAIL and ZO_ROOT_USER_PASSWORD (in .env).")
     auth = base64.b64encode(f"{email}:{password}".encode()).decode()
-    exporter = Exporter(os.environ.get("O2_URL", "http://localhost:5080"), os.environ.get("O2_ORG", "default"),
+    exporter = Exporter(os.environ.get("O2_URL", f"http://localhost:{os.environ.get('O2_PORT', '5080')}"), os.environ.get("O2_ORG", "default"),
                         auth, args.stream, args.env)
     rng = random.Random(args.seed)
 
@@ -431,7 +431,7 @@ def main() -> None:
         spans += len(batch.spans)
         logs += len(batch.logs)
     print(f"sent {args.tasks} tasks: {spans} spans, {logs} log events -> stream '{args.stream}'")
-    print(f"open {os.environ.get('O2_URL', 'http://localhost:5080')} -> Traces -> stream {args.stream}")
+    print(f"open {os.environ.get('O2_URL', 'http://localhost:' + os.environ.get('O2_PORT', '5080'))} -> Traces -> stream {args.stream}")
 
     seq = args.tasks
     while args.live:

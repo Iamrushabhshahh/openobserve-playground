@@ -6,7 +6,7 @@ set -euo pipefail
 
 here="$(cd "$(dirname "$0")/.." && pwd)"
 [ -f "$here/.env" ] && set -a && . "$here/.env" && set +a
-O2_URL="${O2_URL:-http://localhost:5080}"
+O2_URL="${O2_URL:-http://localhost:${O2_PORT:-5080}}"
 O2_ORG="${O2_ORG:-default}"
 AUTH="${ZO_ROOT_USER_EMAIL:?set ZO_ROOT_USER_EMAIL in .env}:${ZO_ROOT_USER_PASSWORD:?set ZO_ROOT_USER_PASSWORD in .env}"
 

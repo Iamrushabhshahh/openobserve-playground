@@ -1,4 +1,7 @@
 .env
+.env.*
+!.env.example
+*.bak-*
 data/
 backups/
 .DS_Store

@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell scripts parse
+        run: for f in scripts/*.sh claude-code/*.sh; do bash -n "$f"; done
+      - name: Python helpers compile
+        run: python3 -m py_compile demo/generate-agent-traces.py
+      - name: Dashboards and alerts are valid JSON
+        run: for f in claude-code/dashboards/*.json claude-code/alerts/*.json; do python3 -m json.tool "$f" >/dev/null; done
+      - name: Compose file is valid
+        run: cp .env.example .env && docker compose config -q
+
+  mcp-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -e ./mcp pytest
+      - run: cd mcp && python -m pytest -q
+
+  quickstart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fresh clone to working playground
+        run: |
+          start=$(date +%s)
+          make doctor up demo
+          echo "Quickstart took $(( $(date +%s) - start )) s"
+      - name: Example traces are queryable
+        run: |
+          set -a; . ./.env; set +a
+          sleep 10
+          now=$(( $(date +%s) * 1000000 )); start=$(( now - 8 * 3600 * 1000000 ))
+          n=$(curl -sf -u "$ZO_ROOT_USER_EMAIL:$ZO_ROOT_USER_PASSWORD" -H 'Content-Type: application/json' \
+            "http://localhost:5080/api/default/_search?type=traces" \
+            -d "{\"query\":{\"sql\":\"SELECT count(*) AS n FROM claude_code\",\"start_time\":$start,\"end_time\":$now,\"from\":0,\"size\":1}}" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["hits"][0]["n"])')
+          echo "spans: $n"
+          test "$n" -gt 100
+      - name: OpenObserve logs on failure
+        if: failure()
+        run: docker compose logs --tail=200 openobserve

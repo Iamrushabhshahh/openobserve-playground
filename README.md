@@ -9,20 +9,24 @@ real sessions.
 
 ![One agent task as a trace: model calls, tools, a helper agent, and time spent waiting for you](docs/images/trace-waterfall-subagent.jpg)
 
-## Try it in 3 steps
+## Try it in one command
 
-You need **Docker**, **make** and **Python 3**.
+You need **Docker** (with Compose v2), **make** and **Python 3**.
 
 ```bash
 git clone https://github.com/Iamrushabhshahh/openobserve-playground.git
 cd openobserve-playground
-
-cp .env.example .env      # 1. pick your login (open the file, change the password)
-make up                   # 2. start OpenObserve
-make demo                 # 3. load 6 hours of example agent activity
+make quickstart
 ```
 
-Now open **<http://localhost:5080>**, log in, and go to **Traces**.
+That's it. `make quickstart` checks your machine, creates `.env` with a generated password
+(it prints the login), starts OpenObserve, loads 6 hours of example agent activity plus three
+dashboards, and opens **<http://localhost:5080>**. Log in and go to **Traces**.
+
+About two minutes on a first run, most of it pulling the 620 MB OpenObserve image once. After
+that, a fresh start takes seconds.
+
+Prefer the steps one by one? `make doctor`, `make up`, `make demo`, `make open`.
 
 > The example data is made up. It looks exactly like real Claude Code data, so everything
 > works the same way. Nothing leaves your machine.
@@ -58,8 +62,11 @@ There's a full guided tour, with the queries behind each view, in
 | I want to… | Do this |
 |---|---|
 | See my real Claude Code sessions | `make claude-code`, then start a new Claude Code session. [More →](claude-code/) |
-| Track my WHOOP recovery, sleep and strain | Follow [whoop/](whoop/) |
+| Stop sending them | `make claude-code-off` (your settings file is backed up first) |
 | Send traces from my own app | Point any OpenTelemetry SDK at `http://localhost:5080/api/default`. [How →](docs/settings.md#send-your-own-data) |
+
+`make claude-code` sends events, metrics and traces, but **not** your prompt text, tool inputs
+or file contents. Add those only if you want them: `CONTENT=1 make claude-code`.
 
 ## Ask Claude about your data
 
@@ -68,12 +75,19 @@ SRE investigates a service. Claude Code can answer questions like "where did the
 slowest session?", "is the agent stuck in a loop?", "are we burning our error budget?", "when
 will we hit our monthly budget?" or "what did the agent run in this session?" straight from
 OpenObserve, without writing SQL. It covers the read paths of OpenObserve's built-in MCP
-and adds what that one lacks. Setup and the full tool list are in
-**[mcp/README.md](mcp/README.md)**.
+and adds what that one lacks.
+
+```bash
+make mcp-install      # Python 3.12+; installs it and registers it with Claude Code
+```
+
+The full tool list is in **[mcp/README.md](mcp/README.md)**.
 
 ## Everyday commands
 
 ```text
+make quickstart  check, start, load example data, open the UI
+make doctor      check Docker, the port, Python and .env
 make up          start OpenObserve
 make demo        load example data
 make demo-live   keep adding new example tasks (Ctrl+C to stop)
@@ -91,9 +105,36 @@ Makefile             the commands above
 .env.example         copy to .env and set your login
 demo/                makes the example agent data
 claude-code/         connect your real Claude Code, plus its dashboards and alerts
-whoop/               WHOOP health data example
+whoop/               optional extra: my WHOOP health data
 scripts/             small helpers that `make` runs for you
 docs/                tracing tour, settings explained, troubleshooting, screenshots
+```
+
+## Extras: my own projects on top
+
+These are things I built on the playground for myself. You don't need any of them.
+
+- **[WHOOP health data](whoop/)**: my recovery, HRV, sleep and strain as dashboards, with an
+  alert when recovery drops. Needs a WHOOP band and a free WHOOP developer app.
+- **[agent-obs MCP](mcp/)**: the SRE view of my coding agents (SLOs, regressions, budgets,
+  audit trail), described above.
+
+## Why I built this
+
+I run Claude Code every day, and for months I couldn't tell you how many steps a prompt took,
+what it cost, or how long it sat waiting for me. Any service in production gets that
+visibility; my agent didn't. This repo is the smallest setup I could find that fixes that: one
+container, a few environment variables, no collector in between. It turned up a number I
+didn't want to see: 43 manual approvals cost me 2 hours 50 minutes in a month. The slow part
+of my agent was me.
+
+## Running it next to another OpenObserve
+
+Set a different port and container name in `.env`, then `make up`:
+
+```bash
+O2_PORT=5090
+O2_CONTAINER=openobserve-2
 ```
 
 ## Something not working?

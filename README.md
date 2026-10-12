@@ -1,5 +1,9 @@
 # openobserve-playground
 
+[![ci](https://github.com/Iamrushabhshahh/openobserve-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/Iamrushabhshahh/openobserve-playground/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![OpenObserve v1.0.4](https://img.shields.io/badge/OpenObserve-v1.0.4-6155f5.svg)](https://openobserve.ai)
+
 A ready-to-run [OpenObserve](https://openobserve.ai) on your laptop, set up for **tracing AI agents**.
 
 Start it, load some example data, and click around. You'll see what an AI coding agent
@@ -144,6 +148,13 @@ won't start if your password is too simple. Use upper and lower case letters, a 
 symbol.
 
 Curious why each setting is there, or how to upgrade? See **[docs/settings.md](docs/settings.md)**.
+
+## Contributing
+
+Issues and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md); questions
+go to [SUPPORT.md](SUPPORT.md), and security reports to [SECURITY.md](SECURITY.md). Everyone
+follows the [Code of Conduct](CODE_OF_CONDUCT.md). Changes are listed in
+[CHANGELOG.md](CHANGELOG.md).
 
 ---
 

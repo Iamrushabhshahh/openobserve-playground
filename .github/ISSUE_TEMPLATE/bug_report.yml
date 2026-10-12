@@ -1,0 +1,33 @@
+name: Bug report
+description: Something does not work as the docs say
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. make up
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error output
+      description: Remove tokens, passwords and personal data first.
+      render: shell
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: macOS 15 / Ubuntu 24.04, Docker 27, Python 3.12, OpenObserve v1.0.4
+    validations:
+      required: true

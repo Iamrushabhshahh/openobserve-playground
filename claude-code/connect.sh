@@ -16,7 +16,7 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"   # repo root, where .env lives
 [ -f "$root/.env" ] && set -a && . "$root/.env" && set +a
 
-O2_URL="${O2_URL:-http://localhost:5080}"
+O2_URL="${O2_URL:-http://localhost:${O2_PORT:-5080}}"
 O2_ORG="${O2_ORG:-default}"
 O2_STREAM="${O2_STREAM:-claude_code}"
 EMAIL="${ZO_ROOT_USER_EMAIL:?set ZO_ROOT_USER_EMAIL in .env}"
@@ -54,6 +54,7 @@ read -r -d '' ENV_JSON <<EOF || true
 EOF
 
 SETTINGS="$HOME/.claude/settings.json"
+[ -f "$SETTINGS" ] && cp "$SETTINGS" "$SETTINGS.bak-$(date +%Y%m%d-%H%M%S)" && echo "backup: $SETTINGS.bak-*"
 if command -v python3 >/dev/null 2>&1; then
   python3 - "$SETTINGS" "$ENV_JSON" <<'PY'
 import json, os, sys

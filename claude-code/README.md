@@ -35,6 +35,15 @@ CONTENT=1 claude-code/connect.sh
 
 Everything stays in your own OpenObserve either way.
 
+## Undo it
+
+```bash
+make claude-code-off
+```
+
+This removes the telemetry settings from `~/.claude/settings.json`. Both `make claude-code` and
+`make claude-code-off` save a timestamped backup of that file first.
+
 ## The dashboards
 
 | Dashboard | Answers |

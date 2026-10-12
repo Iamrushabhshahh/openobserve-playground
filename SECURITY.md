@@ -3,9 +3,8 @@
 ## Reporting a vulnerability
 
 Please **do not** open a public issue. Use GitHub's
-[private vulnerability reporting](https://github.com/Iamrushabhshahh/openobserve-playground/security/advisories/new),
-or email **rushabhshah842@gmail.com**. You will get a reply within 7 days, and a fix or a plan
-within 30 days for confirmed issues.
+[private vulnerability reporting](https://github.com/Iamrushabhshahh/openobserve-playground/security/advisories/new).
+You will get a reply within 7 days, and a fix or a plan within 30 days for confirmed issues.
 
 ## Supported versions
 

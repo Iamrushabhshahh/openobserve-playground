@@ -7,8 +7,8 @@ make room for people who are new. Harassment of any kind is not accepted.
 
 ## Reporting
 
-If someone's behaviour in this project makes you uncomfortable, tell the maintainer privately:
-email **rushabhshah842@gmail.com** or message [@Iamrushabhshahh](https://github.com/Iamrushabhshahh).
+If someone's behaviour in this project makes you uncomfortable, tell the maintainer privately
+by messaging [@Iamrushabhshahh](https://github.com/Iamrushabhshahh) on GitHub.
 Reports are read by the maintainer only and handled confidentially. You will get a reply within
 7 days.
 

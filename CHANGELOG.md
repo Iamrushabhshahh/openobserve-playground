@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-13
+
+### Fixed
+- A fresh clone could not start: the default image on `o2cr.ai` needs a registry login. The
+  playground now pulls the identical enterprise build from public AWS ECR
+  (`public.ecr.aws/zinclabs/openobserve-enterprise:v1.0.4`, same image ID).
+
 ## [1.0.0] - 2026-10-13
 
 ### Added

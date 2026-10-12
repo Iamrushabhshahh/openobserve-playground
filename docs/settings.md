@@ -71,8 +71,8 @@ New OpenObserve versions come out often. Here's the safe way to move to one.
 
 ```bash
 make version                                                     # e.g. "openobserve v1.0.4"
-docker pull o2cr.ai/openobserve/openobserve-enterprise:latest
-docker run --rm --entrypoint /openobserve o2cr.ai/openobserve/openobserve-enterprise:latest --version
+docker pull public.ecr.aws/zinclabs/openobserve-enterprise:latest
+docker run --rm --entrypoint /openobserve public.ecr.aws/zinclabs/openobserve-enterprise:latest --version
 ```
 
 **2. Save a copy of your data.**
@@ -88,7 +88,7 @@ the backup in a second folder of this repo, give it another port in a
 **4. Switch.** Put the exact version in `.env` (not `latest`, so it never changes by surprise):
 
 ```bash
-echo 'O2_IMAGE=o2cr.ai/openobserve/openobserve-enterprise:<new-version>' >> .env
+echo 'O2_IMAGE=public.ecr.aws/zinclabs/openobserve-enterprise:<new-version>' >> .env
 make restart
 make version                 # check it took
 ```

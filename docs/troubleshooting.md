@@ -12,6 +12,12 @@ lowercase letter, a number and a symbol. Change it in `.env`, then run `make res
 The login is saved the first time OpenObserve starts. After that, `.env` is ignored for it.
 Change the password in the UI (**IAM → Users**), or run `make reset` to start over.
 
+### `pull access denied for o2cr.ai/...`
+
+The `o2cr.ai` registry needs a login. This repo pulls the same image from OpenObserve's public
+AWS ECR registry instead (`public.ecr.aws/zinclabs/openobserve-enterprise`). If you set
+`O2_IMAGE` in `.env` to an `o2cr.ai` image, change it to the ECR one.
+
 ### Port 5080 is already in use
 
 Another OpenObserve (or another app) is probably using it. `make doctor` tells you. Either

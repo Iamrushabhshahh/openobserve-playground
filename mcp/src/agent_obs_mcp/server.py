@@ -13,7 +13,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.types import CallToolResult
 from pydantic import Field
 
-from . import agent_tools, completions, parity_tools, prompts, resources, sre_tools
+from . import __version__, agent_tools, completions, parity_tools, prompts, resources, sre_tools
 from . import claude_tools as ct
 from . import sql_tool as sq
 from .client import O2Client
@@ -30,6 +30,8 @@ def build_server(
     settings = settings or load_settings()
     deps = Deps(settings=settings, client=O2Client(settings, transport), clock=clock)
     mcp = FastMCP("agent-obs", instructions=INSTRUCTIONS)
+    # FastMCP reports the SDK version in serverInfo unless the low-level server is told ours.
+    mcp._mcp_server.version = __version__
     _register_claude_tools(mcp, deps)
     _register_other_tools(mcp, deps)
     parity_tools.register(mcp, deps)
@@ -47,8 +49,11 @@ def _register_claude_tools(mcp: FastMCP, deps: Deps) -> None:
     @tool(annotations=READ_ONLY)
     async def list_sessions(
         window: Window = "7d",
-        limit: Annotated[int, Field(ge=1, le=100)] = 20,
-        sort: Literal["cost", "llm_calls", "duration"] = "cost",
+        limit: Annotated[int, Field(description="Maximum sessions to return", ge=1, le=100)] = 20,
+        sort: Annotated[
+            Literal["cost", "llm_calls", "duration"],
+            Field(description="Order by total cost, number of LLM calls, or session duration"),
+        ] = "cost",
     ) -> CallToolResult:
         """Claude Code sessions with cost, LLM calls, tool results/failures, models and first/last seen."""
         return await run_tool(ct.list_sessions(deps, window, limit, sort))
@@ -56,7 +61,9 @@ def _register_claude_tools(mcp: FastMCP, deps: Deps) -> None:
     @tool(annotations=READ_ONLY)
     async def get_trace_tree(
         trace_id: TraceId,
-        max_spans: Annotated[int, Field(ge=1, le=2000)] = 500,
+        max_spans: Annotated[
+            int, Field(description="Maximum spans to fetch for the tree", ge=1, le=2000)
+        ] = 500,
         window: Window = "30d",
     ) -> CallToolResult:
         """Span tree of one interaction with self time, critical path, top-5 self-time spans and LLM/tool/permission-wait totals."""
@@ -69,7 +76,11 @@ def _register_claude_tools(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=READ_ONLY)
     async def cost_report(
-        window: Window = "7d", by: Literal["model", "session", "day"] = "model"
+        window: Window = "7d",
+        by: Annotated[
+            Literal["model", "session", "day"],
+            Field(description="Group spend by model, session, or UTC day"),
+        ] = "model",
     ) -> CallToolResult:
         """Claude Code spend (USD) and tokens from api_request events, grouped by model, session or UTC day."""
         return await run_tool(ct.cost_report(deps, window, by))
@@ -81,7 +92,8 @@ def _register_claude_tools(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=READ_ONLY)
     async def slowest_tools(
-        window: Window = "7d", top: Annotated[int, Field(ge=1, le=50)] = 10
+        window: Window = "7d",
+        top: Annotated[int, Field(description="How many tools to return", ge=1, le=50)] = 10,
     ) -> CallToolResult:
         """p50/p95/max duration of Claude Code tool calls by tool_name, slowest p95 first."""
         return await run_tool(ct.slowest_tools(deps, window, top))
@@ -110,36 +122,48 @@ def _register_other_tools(mcp: FastMCP, deps: Deps) -> None:
         sql: Annotated[
             str, Field(description="One SELECT over the claude_code (or codex) streams")
         ],
-        stream_type: Literal["logs", "traces"] = "logs",
+        stream_type: Annotated[
+            Literal["logs", "traces"],
+            Field(description="Query the logs (events) or the traces stream"),
+        ] = "logs",
         window: Window = "24h",
-        limit: Annotated[int, Field(ge=1, le=500)] = 200,
+        limit: Annotated[
+            int,
+            Field(description="Maximum rows; any LIMIT in the SQL is capped to this", ge=1, le=500),
+        ] = 200,
     ) -> CallToolResult:
         """Guarded escape hatch: a single read-only SELECT; LIMIT forced to ≤500; content columns blocked unless allowed."""
         return await run_tool(sq.run_readonly_sql(deps, sql, stream_type, window, limit))
 
 
 def _register_resources(mcp: FastMCP, settings: Settings) -> None:
-    @mcp.resource("agentobs://schema/claude-code", mime_type="text/markdown")
+    @mcp.resource(
+        "agentobs://schema/claude-code",
+        title="Claude Code telemetry schema",
+        mime_type="text/markdown",
+    )
     def claude_code_schema() -> str:
         """Claude Code span hierarchy, columns, units and SQL gotchas."""
         return resources.claude_code_schema(settings)
 
-    @mcp.resource("agentobs://about", mime_type="text/markdown")
+    @mcp.resource("agentobs://about", title="About agent-obs", mime_type="text/markdown")
     def about() -> str:
         """What this server adds on top of OpenObserve's built-in MCP server."""
         return resources.ABOUT
 
 
 def _register_prompts(mcp: FastMCP) -> None:
-    mcp.prompt(description="Find where the time and money went in one session")(
-        prompts.investigate_slow_session
-    )
-    mcp.prompt(description="Find permission prompts worth turning into allow rules")(
-        prompts.permission_friction_audit
-    )
-    mcp.prompt(description="One-page weekly review of Claude Code usage")(
-        prompts.weekly_agent_review
-    )
+    mcp.prompt(
+        title="Investigate a slow session",
+        description="Find where the time and money went in one session",
+    )(prompts.investigate_slow_session)
+    mcp.prompt(
+        title="Permission friction audit",
+        description="Find permission prompts worth turning into allow rules",
+    )(prompts.permission_friction_audit)
+    mcp.prompt(
+        title="Weekly agent review", description="One-page weekly review of Claude Code usage"
+    )(prompts.weekly_agent_review)
 
 
 def _register_completions(mcp: FastMCP, deps: Deps) -> None:

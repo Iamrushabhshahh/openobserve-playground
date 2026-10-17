@@ -34,11 +34,24 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      # Keep the images between runs: public ECR and Docker Hub rate-limit shared runner IPs.
+      - name: Restore cached images
+        id: images
+        uses: actions/cache@v4
+        with:
+          path: /tmp/images.tar
+          key: images-${{ hashFiles('docker-compose.yml') }}
+      - name: Load cached images
+        if: steps.images.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/images.tar
       - name: Fresh clone to working playground
         run: |
           start=$(date +%s)
           make doctor up demo
           echo "Quickstart took $(( $(date +%s) - start )) s"
+      - name: Save images for the next run
+        if: steps.images.outputs.cache-hit != 'true'
+        run: docker save $(docker compose config --images) -o /tmp/images.tar
       - name: Example traces are queryable
         run: |
           set -a; . ./.env; set +a

@@ -105,8 +105,10 @@ Every log line remembers which step it came from. So you can go either way:
 
 ![A log line that knows its trace](images/log-event.jpg)
 
-If "View Logs" ever opens an empty page, wait a few minutes: OpenObserve links services to
-their logs every 10 minutes.
+If the **Logs** tab or "View Logs" comes up empty, OpenObserve hasn't linked the service to its
+logs yet. It's meant to do that every 10 minutes, but on a fresh v1.1.1 install I've seen it
+take much longer. The search that always works is on the **Logs** page:
+`trace_id = '<the id>'`, or `span_id = '<the id>'` for one step.
 
 ## 7. Turn steps into numbers
 

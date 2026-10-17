@@ -4,7 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-17
+
 ### Added
+- `O2_PROJECT` in `.env`, so a second playground on the same machine gets its own Docker
+  Compose project. Before this, a second folder replaced the first one even with a different
+  port and container name. `make doctor` now catches both cases.
+- `make up` retries image pulls when a registry rate-limits, and only pulls missing images. CI
+  caches the images between runs.
+- `make doctor` warns when the agent-obs MCP install is broken, which happens after a Python
+  upgrade removes the interpreter its virtualenv points at.
 - `AGENTS.md`, so Claude Code, Codex, Cursor, Gemini CLI or Copilot can set the playground up
   step by step, with a check after each step and a list of things to ask first. `CLAUDE.md` and
   `GEMINI.md` point to it, and `/setup` runs it in Claude Code.
@@ -14,11 +23,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   checks, p95/p99 latency and subagents.
 
 ### Changed
+- OpenObserve v1.1.1 by default (was v1.0.4). Fresh installs, upgrades from v1.0.4, every
+  dashboard and all 35 agent-obs smoke calls were checked on it. Upgrading from v1.0.x needs one
+  extra `make restart`; see docs/settings.md.
+- Claude Code Traces dashboard: three tiles per row so titles fit, p95 time to first token in
+  seconds, and named axes instead of `x_axis_1` / `y_axis_1`.
 - New screenshots for the README, the tracing tour and the Claude Code page, taken on a fresh
-  clone with example data, plus Overview and Ops dashboard shots. The README now opens with the
-  end-to-end diagram.
+  v1.1.1 install with example data, plus Overview and Ops dashboard shots. The README now opens
+  with the end-to-end diagram.
 
 ### Fixed
+- The data check in `AGENTS.md` read the streams API's span count, which can show 0 for minutes
+  after the data lands. It now counts with a search query, like CI does. Found by running the
+  setup through Claude Code on a fresh clone.
 - The "Minutes waiting on a human" tile counted every permission check, including the ones
   settings rules approve in about a second. It now counts only waits on a person.
 - The Claude Code Traces dashboard showed counts as "55.00". Counts now have no decimals;

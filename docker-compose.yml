@@ -4,14 +4,15 @@
 #   make up                 # UI on http://localhost:5080
 #
 # Everything OpenObserve stores lives in ./data. Delete it to start from zero.
-name: openobserve-playground
+# O2_PROJECT keeps a second playground on this machine from replacing the first one.
+name: ${O2_PROJECT:-openobserve-playground}
 
 services:
   openobserve:
     # Enterprise build: free to self-host up to an ingestion limit (see README). Pulled from
     # OpenObserve's public AWS ECR registry, so no `docker login` is needed.
     # Set O2_IMAGE in .env to use the open-source build or another version.
-    image: ${O2_IMAGE:-public.ecr.aws/zinclabs/openobserve-enterprise:v1.0.4}
+    image: ${O2_IMAGE:-public.ecr.aws/zinclabs/openobserve-enterprise:v1.1.1}
     container_name: ${O2_CONTAINER:-openobserve}
     ports:
       - "${O2_PORT:-5080}:5080"   # UI, REST API, OTLP/HTTP (change O2_PORT in .env if 5080 is taken)

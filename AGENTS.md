@@ -24,7 +24,7 @@ yes:
   they ask for it by name.
 - `make reset` deletes every stream, dashboard and user.
 - `make mcp-install` registers an MCP server with their Claude Code.
-- Changing `O2_PORT` or `O2_CONTAINER` when they already run another OpenObserve.
+- Changing `O2_PORT`, `O2_CONTAINER` or `O2_PROJECT` when they already run another OpenObserve.
 
 Never print the password from `.env` in the chat. Tell them it's in `.env`, next to
 `ZO_ROOT_USER_EMAIL`. Never commit `.env`.
@@ -36,11 +36,12 @@ fix it before the next step. [docs/troubleshooting.md](docs/troubleshooting.md) 
 usual ones.
 
 1. **Check the machine.** Run `make doctor`. It checks Docker, Compose v2, Python 3, curl and
-   whether port 5080 is free. Fix anything marked `fix`. If 5080 is taken by something else,
-   add `O2_PORT=5090` and `O2_CONTAINER=openobserve-2` to `.env` (after asking) and use that
-   port everywhere below.
+   whether port 5080 is free. Fix anything marked `fix`. If 5080 is taken, or another folder's
+   OpenObserve already uses the name, add `O2_PORT=5090`, `O2_CONTAINER=openobserve-2` and
+   `O2_PROJECT=openobserve-2` to `.env` (after asking) and use that port everywhere below. All
+   three are needed: without `O2_PROJECT`, `make up` would replace their other playground.
 
-2. **Start OpenObserve.** Run `make up`. The first run pulls a ~620 MB image. On first start it
+2. **Start OpenObserve.** Run `make up`. The first run pulls a ~680 MB image. On first start it
    creates `.env` with a generated password. It's done when it prints
    `OpenObserve is up: http://localhost:5080`. If it times out, run `make logs`. The usual cause
    is a password OpenObserve thinks is too weak.
@@ -63,18 +64,20 @@ usual ones.
    and a Basic auth header built from the login in `.env`. Help them set the variables for their
    language, then check with step 7.
 
-7. **Check the data is there.** This lists trace streams and their span counts without printing
-   the password:
+7. **Check the data is there.** This counts the spans from the last 8 hours without printing
+   the password. Use their app's stream name instead of `claude_code` if they sent their own:
 
    ```bash
    set -a; . ./.env; set +a
-   curl -s -u "$ZO_ROOT_USER_EMAIL:$ZO_ROOT_USER_PASSWORD" \
-     "http://localhost:${O2_PORT:-5080}/api/default/streams?type=traces" \
-     | python3 -c 'import json,sys; [print(s["name"], s["stats"]["doc_num"], "spans") for s in json.load(sys.stdin)["list"]]'
+   now=$(( $(date +%s) * 1000000 )); start=$(( now - 8 * 3600 * 1000000 ))
+   curl -s -u "$ZO_ROOT_USER_EMAIL:$ZO_ROOT_USER_PASSWORD" -H 'Content-Type: application/json' \
+     "http://localhost:${O2_PORT:-5080}/api/default/_search?type=traces" \
+     -d "{\"query\":{\"sql\":\"SELECT count(*) AS spans FROM claude_code\",\"start_time\":$start,\"end_time\":$now}}" \
+     | python3 -c 'import json,sys; print(json.load(sys.stdin)["hits"][0]["spans"], "spans")'
    ```
 
-   You want a `claude_code` stream (or their app's stream) with more than zero spans. Counts can
-   lag a few seconds behind.
+   You want more than zero. Don't use the span counts on the Streams page or the streams API
+   for this: they're a summary that can show 0 for several minutes after the data has landed.
 
 8. **Open it and show them around.** Run `make open`, or give them the URL. They log in with the
    email and password from `.env`. Then point them at:

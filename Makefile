@@ -26,6 +26,7 @@ open: ## Open the OpenObserve UI in your browser
 	@(command -v open >/dev/null && open $(O2_URL)) || (command -v xdg-open >/dev/null && xdg-open $(O2_URL)) || echo "Open $(O2_URL)"
 
 up: .env ## Start OpenObserve (and wait until it's ready)
+	@scripts/pull-images.sh
 	docker compose up -d
 	@$(MAKE) -s health
 	@scripts/setup-service-discovery.sh

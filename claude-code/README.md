@@ -76,7 +76,7 @@ Open `~/.claude/settings.json` and remove the `CLAUDE_CODE_*` and `OTEL_*` lines
 
 ```text
 connect.sh        writes the settings into ~/.claude/settings.json
-dashboards/       ops.json, traces.json, team-usage.json
+dashboards/       overview.json, ops.json, traces.json, team-usage.json
 alerts/           daily-cost.json, api-errors.json, mcp-failures.json
 ```
 

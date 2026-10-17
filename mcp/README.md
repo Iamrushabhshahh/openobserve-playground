@@ -10,7 +10,8 @@ slower?"*, *"when will we run out of budget this month?"* or *"what did the agen
 session?"* and get an answer from one tool call.
 
 > Built against the OpenObserve v1.0.4 schema and source. 176 offline tests pass, and
-> `make mcp-smoke` passes all 35 calls against a live v1.0.4 instance with real Claude Code data.
+> `make mcp-smoke` passes all 35 calls against a live v1.0.4 instance with real Claude Code data,
+> and against v1.1.1 with the example data.
 
 ## Why another MCP server, when OpenObserve has one?
 

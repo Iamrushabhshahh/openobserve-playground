@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/Iamrushabhshahh/openobserve-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/Iamrushabhshahh/openobserve-playground/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![OpenObserve v1.0.4](https://img.shields.io/badge/OpenObserve-v1.0.4-6155f5.svg)](https://openobserve.ai)
+[![OpenObserve v1.1.1](https://img.shields.io/badge/OpenObserve-v1.1.1-6155f5.svg)](https://openobserve.ai)
 
 A ready-to-run [OpenObserve](https://openobserve.ai) on your laptop, set up for **tracing AI agents**.
 
@@ -27,7 +27,7 @@ That's it. `make quickstart` checks your machine, creates `.env` with a generate
 (it prints the login), starts OpenObserve, loads 6 hours of example agent activity plus four
 dashboards, and opens **<http://localhost:5080>**. Log in and go to **Traces**.
 
-About two minutes on a first run, most of it pulling the 620 MB OpenObserve image once. After
+About two minutes on a first run, most of it pulling the 680 MB OpenObserve image once. After
 that, a fresh start takes seconds.
 
 Prefer the steps one by one? `make doctor`, `make up`, `make demo`, `make open`.
@@ -77,7 +77,8 @@ AI model, the MCP server, and GitHub behind it.
 ![Service graph](docs/images/service-graph.jpg)
 
 **Logs next to traces.** Click any step, then the **Logs** tab. You get the log lines from that
-moment, right beside the trace.
+moment, right beside the trace. If the tab is empty, OpenObserve hasn't linked the service to
+its logs yet; searching the logs for `trace_id = '<the id>'` always works.
 
 ![Logs for a span](docs/images/trace-to-logs.jpg)
 
@@ -165,12 +166,16 @@ permission prompts and 66 questions it asked me. Six hours. The slow part of my 
 
 ## Running it next to another OpenObserve
 
-Set a different port and container name in `.env`, then `make up`:
+Set a different port, container name and project name in `.env`, then `make up`:
 
 ```bash
 O2_PORT=5090
 O2_CONTAINER=openobserve-2
+O2_PROJECT=openobserve-2
 ```
+
+All three matter. Without `O2_PROJECT`, Docker treats the new folder as your first playground
+and replaces it. `make doctor` checks this for you.
 
 ## Something not working?
 

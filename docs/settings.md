@@ -6,7 +6,7 @@ Everything here is already set up for you. This page is for when you want to kno
 
 | Setting | What it does | Why it's on |
 |---|---|---|
-| Image `openobserve-enterprise:v1.0.4` | The OpenObserve version | Pinned, so a restart never upgrades your data by surprise. |
+| Image `openobserve-enterprise:v1.1.1` | The OpenObserve version | Pinned, so a restart never upgrades your data by surprise. |
 | `O2_SERVICE_STREAMS_ENABLED=true` | Lets OpenObserve figure out which logs, traces and metrics belong to the same service | Without it, "View Logs" on a trace opens an empty page. |
 | `O2_SERVICE_STREAMS_SAMPLE_RATE=1` | Looks at every record, not a sample | A laptop sends little data, so sampling would miss things. |
 | `O2_SERVICE_GRAPH_PROCESSING_INTERVAL_SECS=60` | Rebuilds the service graph every minute | Otherwise you'd wait a long time to see it. |
@@ -27,7 +27,7 @@ uses a tiny fraction of that.
 Prefer the open-source build? Add this to `.env`, delete `./data`, and run `make restart`:
 
 ```bash
-O2_IMAGE=public.ecr.aws/zinclabs/openobserve:v1.0.4
+O2_IMAGE=public.ecr.aws/zinclabs/openobserve:v1.1.1
 ```
 
 Traces, logs and metrics all work. A few of the links between them won't.
@@ -70,7 +70,7 @@ New OpenObserve versions come out often. Here's the safe way to move to one.
 **1. See what you're on, and what's new.**
 
 ```bash
-make version                                                     # e.g. "openobserve v1.0.4"
+make version                                                     # e.g. "openobserve v1.1.1"
 docker pull public.ecr.aws/zinclabs/openobserve-enterprise:latest
 docker run --rm --entrypoint /openobserve public.ecr.aws/zinclabs/openobserve-enterprise:latest --version
 ```
@@ -81,9 +81,10 @@ docker run --rm --entrypoint /openobserve public.ecr.aws/zinclabs/openobserve-en
 make backup                  # writes backups/o2-data-<date>.tgz
 ```
 
-**3. Try the new version on that copy first** (optional, but worth it for a big jump). Unpack
-the backup in a second folder of this repo, give it another port in a
-`docker-compose.override.yml`, start it, and click around. Your real instance keeps running.
+**3. Try the new version on that copy first** (optional, but worth it for a big jump). Clone
+this repo into a second folder, unpack the backup there, and give it its own `.env` with
+`O2_PORT=5090`, `O2_CONTAINER=openobserve-2` and `O2_PROJECT=openobserve-2`. Start it with the
+new `O2_IMAGE` and click around. Your real instance keeps running.
 
 **4. Switch.** Put the exact version in `.env` (not `latest`, so it never changes by surprise):
 
@@ -96,6 +97,10 @@ make version                 # check it took
 OpenObserve upgrades its database by itself on first start. If something's wrong, remove the
 `O2_IMAGE` line, restore the backup (below) and `make restart`.
 
+Going from v1.0.x to v1.1.x, run `make restart` once more after the first start. On the first
+boot after the upgrade I saw `connect to gRPC node error` every minute and alerts failing to
+evaluate; one restart cleared both. A fresh v1.1.1 install doesn't have this.
+
 **5. Tidy up** once you're happy:
 
 ```bash
@@ -103,8 +108,8 @@ make clean-images            # lists old OpenObserve images and asks before remo
 rm backups/o2-data-<date>.tgz
 ```
 
-That's exactly how this playground went from v0.92.2 to v1.0.4: the database upgraded itself
-(schema 64 → 77), and every stream, dashboard and alert came through.
+That's how this playground went from v0.92.2 to v1.0.4 (schema 64 → 77) and then to v1.1.1:
+the database upgraded itself, and every stream, dashboard and alert came through.
 
 ## Back up and restore
 

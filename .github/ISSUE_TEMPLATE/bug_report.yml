@@ -28,6 +28,6 @@ body:
     id: env
     attributes:
       label: Environment
-      placeholder: macOS 15 / Ubuntu 24.04, Docker 27, Python 3.12, OpenObserve v1.0.4
+      placeholder: macOS 15 / Ubuntu 24.04, Docker 27, Python 3.12, OpenObserve v1.1.1
     validations:
       required: true

@@ -114,7 +114,7 @@
           "layout": {
             "x": 0,
             "y": 0,
-            "w": 8,
+            "w": 16,
             "h": 6,
             "i": 1,
             "moved": false
@@ -224,9 +224,9 @@
             }
           ],
           "layout": {
-            "x": 8,
+            "x": 16,
             "y": 0,
-            "w": 8,
+            "w": 16,
             "h": 6,
             "i": 2,
             "moved": false
@@ -336,9 +336,9 @@
             }
           ],
           "layout": {
-            "x": 16,
+            "x": 32,
             "y": 0,
-            "w": 8,
+            "w": 16,
             "h": 6,
             "i": 3,
             "moved": false
@@ -448,9 +448,9 @@
             }
           ],
           "layout": {
-            "x": 24,
-            "y": 0,
-            "w": 8,
+            "x": 0,
+            "y": 6,
+            "w": 16,
             "h": 6,
             "i": 4,
             "moved": false
@@ -560,9 +560,9 @@
             }
           ],
           "layout": {
-            "x": 32,
-            "y": 0,
-            "w": 8,
+            "x": 16,
+            "y": 6,
+            "w": 16,
             "h": 6,
             "i": 5,
             "moved": false
@@ -574,13 +574,13 @@
         {
           "id": "Panel_ID6",
           "type": "metric",
-          "title": "p95 time to first token (ms)",
+          "title": "p95 time to first token",
           "description": "",
           "config": {
             "show_legends": true,
             "legends_position": null,
-            "unit": null,
-            "decimals": 0.0,
+            "unit": "custom",
+            "decimals": 1,
             "line_thickness": 1.5,
             "top_results_others": false,
             "axis_border_show": false,
@@ -630,12 +630,13 @@
             "trellis": {
               "layout": null,
               "num_of_columns": 1
-            }
+            },
+            "unit_custom": "s"
           },
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT round(approx_percentile_cont(CAST(ttft_ms AS INT),0.95)) AS y_axis_1 FROM \"claude_code\" WHERE operation_name='claude_code.llm_request'",
+              "query": "SELECT round(approx_percentile_cont(TRY_CAST(ttft_ms AS DOUBLE),0.95)/1000.0,1) AS y_axis_1 FROM \"claude_code\" WHERE operation_name='claude_code.llm_request'",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
@@ -672,9 +673,9 @@
             }
           ],
           "layout": {
-            "x": 40,
-            "y": 0,
-            "w": 8,
+            "x": 32,
+            "y": 6,
+            "w": 16,
             "h": 6,
             "i": 6,
             "moved": false
@@ -747,7 +748,7 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT tool_name AS x_axis_1, round(sum(duration)/1000000.0,1) AS y_axis_1 FROM \"claude_code\" WHERE operation_name='claude_code.tool' GROUP BY tool_name ORDER BY y_axis_1 DESC LIMIT 12",
+              "query": "SELECT tool_name AS tool, round(sum(duration)/1000000.0,1) AS seconds FROM \"claude_code\" WHERE operation_name='claude_code.tool' GROUP BY tool_name ORDER BY seconds DESC LIMIT 12",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
@@ -755,18 +756,18 @@
                 "stream_type": "traces",
                 "x": [
                   {
-                    "label": "x_axis_1",
-                    "alias": "x_axis_1",
-                    "column": "x_axis_1",
+                    "label": "tool",
+                    "alias": "tool",
+                    "column": "tool",
                     "color": null,
                     "isDerived": false
                   }
                 ],
                 "y": [
                   {
-                    "label": "y_axis_1",
-                    "alias": "y_axis_1",
-                    "column": "y_axis_1",
+                    "label": "seconds",
+                    "alias": "seconds",
+                    "column": "seconds",
                     "color": "#5960b2",
                     "aggregationFunction": null,
                     "isDerived": false
@@ -793,7 +794,7 @@
           ],
           "layout": {
             "x": 0,
-            "y": 6,
+            "y": 12,
             "w": 24,
             "h": 10,
             "i": 7,
@@ -867,7 +868,7 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT CASE operation_name WHEN 'claude_code.tool.execution' THEN 'executing' WHEN 'claude_code.tool.blocked_on_user' THEN 'waiting for permission' END AS x_axis_1, round(sum(duration)/1000000.0,1) AS y_axis_1 FROM \"claude_code\" WHERE operation_name IN ('claude_code.tool.execution','claude_code.tool.blocked_on_user') GROUP BY x_axis_1",
+              "query": "SELECT CASE operation_name WHEN 'claude_code.tool.execution' THEN 'executing' WHEN 'claude_code.tool.blocked_on_user' THEN 'waiting for permission' END AS step, round(sum(duration)/1000000.0,1) AS seconds FROM \"claude_code\" WHERE operation_name IN ('claude_code.tool.execution','claude_code.tool.blocked_on_user') GROUP BY step",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
@@ -875,18 +876,18 @@
                 "stream_type": "traces",
                 "x": [
                   {
-                    "label": "x_axis_1",
-                    "alias": "x_axis_1",
-                    "column": "x_axis_1",
+                    "label": "step",
+                    "alias": "step",
+                    "column": "step",
                     "color": null,
                     "isDerived": false
                   }
                 ],
                 "y": [
                   {
-                    "label": "y_axis_1",
-                    "alias": "y_axis_1",
-                    "column": "y_axis_1",
+                    "label": "seconds",
+                    "alias": "seconds",
+                    "column": "seconds",
                     "color": "#5960b2",
                     "aggregationFunction": null,
                     "isDerived": false
@@ -913,7 +914,7 @@
           ],
           "layout": {
             "x": 24,
-            "y": 6,
+            "y": 12,
             "w": 24,
             "h": 10,
             "i": 8,
@@ -987,7 +988,7 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT histogram(_timestamp,'1 hour') AS x_axis_1, count(*) AS y_axis_1, concat(model,' / ',stop_reason) AS breakdown_1 FROM \"claude_code\" WHERE operation_name='claude_code.llm_request' GROUP BY x_axis_1, breakdown_1 ORDER BY x_axis_1",
+              "query": "SELECT histogram(_timestamp,'1 hour') AS hour, count(*) AS calls, concat(model,' / ',stop_reason) AS model_and_stop_reason FROM \"claude_code\" WHERE operation_name='claude_code.llm_request' GROUP BY hour, model_and_stop_reason ORDER BY hour",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
@@ -995,18 +996,18 @@
                 "stream_type": "traces",
                 "x": [
                   {
-                    "label": "x_axis_1",
-                    "alias": "x_axis_1",
-                    "column": "x_axis_1",
+                    "label": "hour",
+                    "alias": "hour",
+                    "column": "hour",
                     "color": null,
                     "isDerived": false
                   }
                 ],
                 "y": [
                   {
-                    "label": "y_axis_1",
-                    "alias": "y_axis_1",
-                    "column": "y_axis_1",
+                    "label": "calls",
+                    "alias": "calls",
+                    "column": "calls",
                     "color": "#5960b2",
                     "aggregationFunction": null,
                     "isDerived": false
@@ -1015,9 +1016,9 @@
                 "z": [],
                 "breakdown": [
                   {
-                    "label": "breakdown_1",
-                    "alias": "breakdown_1",
-                    "column": "breakdown_1",
+                    "label": "model and stop reason",
+                    "alias": "model_and_stop_reason",
+                    "column": "model_and_stop_reason",
                     "color": null,
                     "isDerived": false
                   }
@@ -1041,7 +1042,7 @@
           ],
           "layout": {
             "x": 0,
-            "y": 16,
+            "y": 22,
             "w": 24,
             "h": 10,
             "i": 9,
@@ -1115,7 +1116,7 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT histogram(_timestamp,'1 hour') AS x_axis_1, round(avg(CAST(ttft_ms AS INT))) AS y_axis_1, round(approx_percentile_cont(CAST(ttft_ms AS INT),0.95)) AS y_axis_2 FROM \"claude_code\" WHERE operation_name='claude_code.llm_request' GROUP BY x_axis_1 ORDER BY x_axis_1",
+              "query": "SELECT histogram(_timestamp,'1 hour') AS hour, round(avg(CAST(ttft_ms AS INT))) AS average_ms, round(approx_percentile_cont(CAST(ttft_ms AS INT),0.95)) AS p95_ms FROM \"claude_code\" WHERE operation_name='claude_code.llm_request' GROUP BY hour ORDER BY hour",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {
@@ -1123,26 +1124,26 @@
                 "stream_type": "traces",
                 "x": [
                   {
-                    "label": "x_axis_1",
-                    "alias": "x_axis_1",
-                    "column": "x_axis_1",
+                    "label": "hour",
+                    "alias": "hour",
+                    "column": "hour",
                     "color": null,
                     "isDerived": false
                   }
                 ],
                 "y": [
                   {
-                    "label": "y_axis_1",
-                    "alias": "y_axis_1",
-                    "column": "y_axis_1",
+                    "label": "average ms",
+                    "alias": "average_ms",
+                    "column": "average_ms",
                     "color": "#5960b2",
                     "aggregationFunction": null,
                     "isDerived": false
                   },
                   {
-                    "label": "y_axis_2",
-                    "alias": "y_axis_2",
-                    "column": "y_axis_2",
+                    "label": "p95 ms",
+                    "alias": "p95_ms",
+                    "column": "p95_ms",
                     "color": "#5960b2",
                     "aggregationFunction": null,
                     "isDerived": false
@@ -1169,7 +1170,7 @@
           ],
           "layout": {
             "x": 24,
-            "y": 16,
+            "y": 22,
             "w": 24,
             "h": 10,
             "i": 10,
@@ -1281,7 +1282,7 @@
           ],
           "layout": {
             "x": 0,
-            "y": 26,
+            "y": 32,
             "w": 24,
             "h": 10,
             "i": 11,
@@ -1393,7 +1394,7 @@
           ],
           "layout": {
             "x": 24,
-            "y": 26,
+            "y": 32,
             "w": 24,
             "h": 10,
             "i": 12,
@@ -1505,7 +1506,7 @@
           ],
           "layout": {
             "x": 0,
-            "y": 36,
+            "y": 42,
             "w": 48,
             "h": 10,
             "i": 13,

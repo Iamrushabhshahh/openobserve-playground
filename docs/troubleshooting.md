@@ -21,7 +21,8 @@ AWS ECR registry instead (`public.ecr.aws/zinclabs/openobserve-enterprise`). If 
 ### Port 5080 is already in use
 
 Another OpenObserve (or another app) is probably using it. `make doctor` tells you. Either
-stop it, or set `O2_PORT=5090` and `O2_CONTAINER=openobserve-2` in `.env`, then `make up`.
+stop it, or set `O2_PORT=5090`, `O2_CONTAINER=openobserve-2` and `O2_PROJECT=openobserve-2` in
+`.env`, then `make up`. Leave out `O2_PROJECT` and Docker replaces your other playground.
 
 ### I don't see a "View Trace" button on a log line
 

@@ -17,12 +17,21 @@ docker compose version >/dev/null 2>&1 && ok "docker compose v2" || bad "install
 command -v python3 >/dev/null && ok "python3 $(python3 -c 'import sys;print(".".join(map(str,sys.version_info[:2])))')" || bad "install Python 3 (used by the helper scripts)"
 command -v curl >/dev/null && ok "curl installed" || bad "install curl"
 
+second="set O2_PORT=5090, O2_CONTAINER=openobserve-2 and O2_PROJECT=openobserve-2 in .env"
 if docker ps --format '{{.Names}}' 2>/dev/null | grep -qx "$container"; then
-  ok "OpenObserve container '$container' is already running on port $port"
+  owner="$(docker inspect -f '{{ index .Config.Labels "com.docker.compose.project.working_dir" }}' "$container" 2>/dev/null)"
+  if [ -n "$owner" ] && [ "$owner" != "$here" ]; then
+    bad "an OpenObserve started from $owner already uses the name '$container': $second"
+  else
+    ok "OpenObserve container '$container' is already running on port $port"
+  fi
 elif (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; then
-  bad "port $port is in use by something else: set O2_PORT=5090 (and O2_CONTAINER=openobserve-2) in .env"
+  bad "port $port is in use by something else: $second"
 else
   ok "port $port is free"
+fi
+if [ "$container" != "openobserve" ] && [ -z "${O2_PROJECT:-}" ]; then
+  bad "O2_CONTAINER is set but O2_PROJECT is not: Docker would treat this as your other playground. Add O2_PROJECT=$container to .env"
 fi
 
 if [ -n "${ZO_ROOT_USER_PASSWORD:-}" ]; then
@@ -35,5 +44,8 @@ else
   warn ".env not created yet (make up creates it with a generated password)"
 fi
 command -v claude >/dev/null && ok "Claude Code installed (for make claude-code)" || warn "Claude Code not found: only needed to send your real sessions"
+if [ -d "$here/mcp/.venv" ] && ! "$here/mcp/.venv/bin/python" -c '' 2>/dev/null; then
+  warn "the agent-obs MCP install is broken (usually after a Python upgrade): rm -rf mcp/.venv, then make mcp-install"
+fi
 
 [ "$fail" = 0 ] && echo "All good." || { echo "Fix the items above, then run: make up"; exit 1; }

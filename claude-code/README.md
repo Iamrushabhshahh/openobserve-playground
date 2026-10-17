@@ -8,7 +8,7 @@ playground, so every session shows up in OpenObserve.
 
 ```bash
 make up            # if the playground isn't running yet
-make claude-code   # connects Claude Code and adds three dashboards
+make claude-code   # connects Claude Code and adds four dashboards
 ```
 
 Then **start a new Claude Code session** (old ones don't pick up the change) and ask it
@@ -48,6 +48,7 @@ This removes the telemetry settings from `~/.claude/settings.json`. Both `make c
 
 | Dashboard | Answers |
 |---|---|
+| **Claude Code · Overview** | The headline numbers on one page: sessions, cost and cost per session, waits on a human, rule-approved checks, p95/p99 latency, subagents |
 | **Claude Code · Ops** | Is it fast? (time to first token, model call time) Is it reliable? (failed tools, API errors, MCP servers) What does it cost? (per model, per repo) |
 | **Claude Code Traces** | Where does the time go: the model, the tools, or waiting for me? |
 | **Claude Code Team Productivity** | Cost, tokens, sessions and tool use per person |

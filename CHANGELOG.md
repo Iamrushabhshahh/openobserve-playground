@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+### Added
+- `AGENTS.md`, so Claude Code, Codex, Cursor, Gemini CLI or Copilot can set the playground up
+  step by step, with a check after each step and a list of things to ask first. `CLAUDE.md` and
+  `GEMINI.md` point to it, and `/setup` runs it in Claude Code.
+- `docs/how-it-works.md` with diagrams: the pieces, one prompt as spans, subagents in one trace,
+  what OpenObserve does to every span, and the write and read paths.
+- Claude Code · Overview dashboard: sessions, cost per session, waits on a human, rule-approved
+  checks, p95/p99 latency and subagents.
+
+### Fixed
+- The "Minutes waiting on a human" tile counted every permission check, including the ones
+  settings rules approve in about a second. It now counts only waits on a person.
+
 ## [1.0.1] - 2026-10-13
 
 ### Fixed

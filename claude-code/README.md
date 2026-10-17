@@ -53,6 +53,12 @@ This removes the telemetry settings from `~/.claude/settings.json`. Both `make c
 | **Claude Code Traces** | Where does the time go: the model, the tools, or waiting for me? |
 | **Claude Code Team Productivity** | Cost, tokens, sessions and tool use per person |
 
+Overview and Ops, with example data:
+
+![Claude Code · Overview](../docs/images/dashboard-overview.jpg)
+
+![Claude Code · Ops](../docs/images/dashboard-ops.jpg)
+
 ## The alerts
 
 | Alert | Tells you when |

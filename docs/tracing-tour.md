@@ -38,9 +38,11 @@ flowchart TD
 
 ## 2. The list of tasks
 
-Go to **Traces** and pick the stream `claude_code`. Each row is one task: when it ran, how
-long it took, how many steps it had, and whether something failed. The three small charts on
-top show how many tasks ran, how many had errors, and how long they took.
+Go to **Traces**, open the **Traces** tab and pick the stream `claude_code`. Each row is one
+task: when it ran, how long it took, how many steps it had, and whether something failed. The
+screenshot filters on `operation_name = 'claude_code.interaction'`, so only whole tasks show
+up. The three small charts on top show how many tasks ran, how many had errors, and how long
+they took.
 
 ![Traces list](images/traces-list.jpg)
 
@@ -83,8 +85,8 @@ The **Attributes** tab has everything else that was recorded about the step:
 
 ## 5. The big picture
 
-**Traces → Service Graph → Graph View** draws everything the agent talked to: the AI models,
-the MCP server, and GitHub behind it. A green border means few errors; red means many.
+**Traces → Service Graph** draws everything the agent talked to: the AI model, the MCP server,
+and GitHub behind it. A green border means few errors; red means many.
 
 ![Service graph](images/service-graph.jpg)
 
@@ -108,8 +110,12 @@ their logs every 10 minutes.
 
 ## 7. Turn steps into numbers
 
-Steps are data, so you can ask questions with SQL and put the answers on a dashboard. For
-example, "where does the agent's time go?":
+Steps are data, so you can ask questions with SQL and put the answers on a dashboard. The
+**Claude Code · Overview** dashboard puts the headline numbers on one page:
+
+![Claude Code · Overview dashboard](images/dashboard-overview.jpg)
+
+And **Claude Code Traces** answers "where does the agent's time go?":
 
 ![Traces dashboard](images/dashboard-traces.jpg)
 

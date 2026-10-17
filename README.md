@@ -11,7 +11,7 @@ actually does when you give it a task: every model call, every tool it runs, how
 it waiting, and what it cost. When you're ready, connect your own Claude Code and watch your
 real sessions.
 
-![One agent task as a trace: model calls, tools, a helper agent, and time spent waiting for you](docs/images/trace-waterfall-subagent.jpg)
+![How the playground fits together: Claude Code, example data or your app send OTLP to one OpenObserve container, which you read in the browser](docs/images/how-it-fits.png)
 
 ## Try it in one command
 
@@ -69,10 +69,10 @@ how many steps it had, and whether something failed.
 tool, or waiting for you to say "yes". Steps inside steps show a helper agent at work, or a
 call that went out to another service.
 
-![A trace that crosses into an MCP server and GitHub](docs/images/trace-waterfall-mcp.jpg)
+![One agent task as a trace: model calls, tools, a helper agent, and time spent waiting for you](docs/images/trace-waterfall-subagent.jpg)
 
-**The service graph.** *Traces → Service Graph → Graph View.* A map of everything the agent
-talked to: the AI models, the MCP server, and GitHub behind it.
+**The service graph.** *Traces → Service Graph.* A map of everything the agent talked to: the
+AI model, the MCP server, and GitHub behind it.
 
 ![Service graph](docs/images/service-graph.jpg)
 
@@ -81,11 +81,15 @@ moment, right beside the trace.
 
 ![Logs for a span](docs/images/trace-to-logs.jpg)
 
+**The dashboards.** *Dashboards → Claude Code · Overview.* The headline numbers on one page:
+sessions, cost per session, how often the agent waited for you, latency and subagents. Three
+more dashboards go deeper; they're listed in [claude-code/](claude-code/).
+
+![Claude Code · Overview dashboard](docs/images/dashboard-overview.jpg)
+
 There's a full guided tour, with the queries behind each view, in
 **[docs/tracing-tour.md](docs/tracing-tour.md)**. For what happens between Claude Code and the
 screen, with diagrams, see **[docs/how-it-works.md](docs/how-it-works.md)**.
-
-![How the playground fits together](docs/images/how-it-fits.png)
 
 ## Use your own data
 

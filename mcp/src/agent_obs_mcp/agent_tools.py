@@ -238,7 +238,13 @@ def register(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=READ_ONLY)
     async def detect_loops(
-        window: Window = "24h", min_repeats: Annotated[int, Field(ge=2, le=50)] = 3
+        window: Window = "24h",
+        min_repeats: Annotated[
+            int,
+            Field(
+                description="Identical tool calls in a row before they count as a loop", ge=2, le=50
+            ),
+        ] = 3,
     ) -> CallToolResult:
         """Stuck-agent suspects: repeated tool calls, fail→retry chains, retry storms."""
         return await run_tool(find_loop_suspects(deps, window, min_repeats))
@@ -252,7 +258,11 @@ def register(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=READ_ONLY)
     async def audit_trail(
-        session_id: SessionId, include_commands: bool = False, window: Window = "30d"
+        session_id: SessionId,
+        include_commands: Annotated[
+            bool, Field(description="Include Bash command lines in the trail")
+        ] = False,
+        window: Window = "30d",
     ) -> CallToolResult:
         """Chronological, content-redacted compliance action log of one session."""
         return await run_tool(session_audit_trail(deps, session_id, include_commands, window))

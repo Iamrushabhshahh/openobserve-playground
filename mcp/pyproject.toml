@@ -1,7 +1,7 @@
 [project]
 name = "agent-obs-mcp"
 version = "0.1.0"
-description = "Read-only MCP server for Claude Code telemetry and WHOOP health data stored in OpenObserve"
+description = "MCP server for investigating AI coding agents (Claude Code, Codex) from their telemetry in OpenObserve"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"

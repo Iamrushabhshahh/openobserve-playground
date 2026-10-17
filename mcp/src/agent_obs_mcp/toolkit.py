@@ -11,7 +11,10 @@ from pydantic import Field
 from .client import O2Error
 from .render import ToolOutput
 
-READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True)
+# openWorldHint=False: every tool talks only to the configured OpenObserve, never the open web.
+READ_ONLY = ToolAnnotations(
+    readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False
+)
 INSTRUCTIONS = (
     "Agent observability over OpenObserve for Claude Code and Codex telemetry. "
     "Prefer the task-shaped tools (sessions, trace trees, permission waits, loops, SLOs, "
@@ -38,4 +41,6 @@ async def run_tool(work: Awaitable[ToolOutput]) -> CallToolResult:
     )
 
 
-WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=False)
+WRITE = ToolAnnotations(
+    readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False
+)

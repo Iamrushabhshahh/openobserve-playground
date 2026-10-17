@@ -132,9 +132,24 @@ def _register_reliability(mcp: FastMCP, deps: Deps) -> None:
     )
     async def slo_tool(
         window: Window = "7d",
-        success_target: Annotated[float, Field(gt=0.5, lt=1)] = 0.95,
-        latency_target_s: Annotated[float, Field(gt=0, le=86_400)] = 300,
-        latency_quantile: Annotated[float, Field(ge=0.5, lt=1)] = 0.95,
+        success_target: Annotated[
+            float,
+            Field(
+                description="Target share of successful interactions, above 0.5 and below 1",
+                gt=0.5,
+                lt=1,
+            ),
+        ] = 0.95,
+        latency_target_s: Annotated[
+            float,
+            Field(description="Latency objective for one interaction, in seconds", gt=0, le=86_400),
+        ] = 300,
+        latency_quantile: Annotated[
+            float,
+            Field(
+                description="Quantile the latency objective applies to, such as 0.95", ge=0.5, lt=1
+            ),
+        ] = 0.95,
     ) -> CallToolResult:
         return await run_tool(
             agent_slo_report(deps, window, success_target, latency_target_s, latency_quantile)
@@ -150,8 +165,9 @@ def _register_reliability(mcp: FastMCP, deps: Deps) -> None:
         ),
     )
     async def regression_tool(
-        metric: Literal[
-            "ttft", "cost_per_interaction", "tool_failure_rate", "interaction_latency"
+        metric: Annotated[
+            Literal["ttft", "cost_per_interaction", "tool_failure_rate", "interaction_latency"],
+            Field(description="Metric to compare across Claude Code versions and models"),
         ] = "ttft",
         baseline: Window = "7d",
         recent: Window = "24h",

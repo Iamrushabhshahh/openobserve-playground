@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import re
+from typing import Annotated
+
+from pydantic import Field
 
 _UNSAFE = re.compile(r"[^A-Za-z0-9_.:-]")
 
 
-def investigate_slow_session(session_id: str) -> str:
+def investigate_slow_session(
+    session_id: Annotated[str, Field(description="Claude Code session id, from list_sessions")],
+) -> str:
     session_id = _UNSAFE.sub("", session_id)[:128]
     return f"""Investigate why Claude Code session `{session_id}` was slow or expensive.
 
@@ -22,7 +27,9 @@ def investigate_slow_session(session_id: str) -> str:
    (allow rules, smaller context, fewer sub-agents, faster tools)."""
 
 
-def permission_friction_audit(window: str = "30d") -> str:
+def permission_friction_audit(
+    window: Annotated[str, Field(description="Relative window such as 7d or 30d")] = "30d",
+) -> str:
     return f"""Audit permission friction in Claude Code over the last {window}.
 
 1. Call `permission_wait_report` with window "{window}".

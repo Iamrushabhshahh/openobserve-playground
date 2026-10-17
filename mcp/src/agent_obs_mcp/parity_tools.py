@@ -466,15 +466,25 @@ def _register_streams(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=READ_ONLY)
     async def list_streams(
-        stream_type: Literal["logs", "traces", "metrics", "all"] = "all",
-        keyword: str = "",
-        limit: Annotated[int, Field(ge=1, le=500)] = 100,
+        stream_type: Annotated[
+            Literal["logs", "traces", "metrics", "all"],
+            Field(description="Only streams of this type, or all"),
+        ] = "all",
+        keyword: Annotated[
+            str, Field(description="Only streams whose name contains this text")
+        ] = "",
+        limit: Annotated[int, Field(description="Maximum streams to return", ge=1, le=500)] = 100,
     ) -> CallToolResult:
         """Streams with type, doc count and storage size, largest first. Mirrors StreamList."""
         return await run_tool(list_streams_impl(deps, stream_type, keyword, limit))
 
     @tool(annotations=READ_ONLY)
-    async def stream_schema(stream: StreamName, stream_type: StreamKind = "logs") -> CallToolResult:
+    async def stream_schema(
+        stream: StreamName,
+        stream_type: Annotated[
+            StreamKind, Field(description="Stream type: logs, traces or metrics")
+        ] = "logs",
+    ) -> CallToolResult:
         """Fields and types of a stream plus SQL gotchas (Utf8 numerics). Mirrors StreamSchema."""
         return await run_tool(stream_schema_impl(deps, stream, stream_type))
 
@@ -485,10 +495,14 @@ def _register_search(mcp: FastMCP, deps: Deps) -> None:
     @tool(annotations=READ_ONLY)
     async def search_sql(
         sql: Annotated[str, Field(description="One SELECT over any stream")],
-        stream_type: StreamKind = "logs",
+        stream_type: Annotated[
+            StreamKind, Field(description="Stream type the SQL reads: logs, traces or metrics")
+        ] = "logs",
         window: Window = "1h",
-        limit: Annotated[int, Field(ge=1, le=500)] = 100,
-        output_format: OutputFormat = "csv",
+        limit: Annotated[int, Field(description="Maximum rows to return", ge=1, le=500)] = 100,
+        output_format: Annotated[
+            OutputFormat, Field(description="Result format: CSV, a Markdown table, or JSON")
+        ] = "csv",
     ) -> CallToolResult:
         """Guarded SQL over any stream: one SELECT, no DDL/DML, LIMIT ≤500, content columns
         blocked unless allowed. Mirrors SearchSQL."""
@@ -497,10 +511,21 @@ def _register_search(mcp: FastMCP, deps: Deps) -> None:
     @tool(annotations=READ_ONLY)
     async def search_values(
         stream: StreamName,
-        fields: Annotated[list[str], Field(min_length=1, max_length=10)],
-        stream_type: StreamKind = "logs",
+        fields: Annotated[
+            list[str],
+            Field(
+                description="Fields to list the top values of (1 to 10)",
+                min_length=1,
+                max_length=10,
+            ),
+        ],
+        stream_type: Annotated[
+            StreamKind, Field(description="Stream type: logs, traces or metrics")
+        ] = "logs",
         window: Window = "24h",
-        size: Annotated[int, Field(ge=1, le=100)] = 10,
+        size: Annotated[
+            int, Field(description="Top values to return per field", ge=1, le=100)
+        ] = 10,
     ) -> CallToolResult:
         """Top distinct values (with counts) of one or more fields. Mirrors SearchValues."""
         return await run_tool(search_values_impl(deps, stream, fields, stream_type, window, size))
@@ -509,8 +534,17 @@ def _register_search(mcp: FastMCP, deps: Deps) -> None:
     async def search_around(
         stream: StreamName,
         timestamp_us: Annotated[int, Field(description="_timestamp (µs) of the anchor record")],
-        size: Annotated[int, Field(ge=2, le=100)] = 20,
-        stream_type: StreamKind = "logs",
+        size: Annotated[
+            int,
+            Field(
+                description="Records to return around the anchor, before and after combined",
+                ge=2,
+                le=100,
+            ),
+        ] = 20,
+        stream_type: Annotated[
+            StreamKind, Field(description="Stream type: logs, traces or metrics")
+        ] = "logs",
     ) -> CallToolResult:
         """Records just before and after one record, for context. Mirrors SearchAround."""
         return await run_tool(search_around_impl(deps, stream, timestamp_us, size, stream_type))
@@ -519,7 +553,9 @@ def _register_search(mcp: FastMCP, deps: Deps) -> None:
     async def extract_patterns(
         stream: StreamName,
         window: Window = "1h",
-        sample_size: Annotated[int, Field(ge=100, le=10_000)] = 2000,
+        sample_size: Annotated[
+            int, Field(description="Log lines to sample before clustering", ge=100, le=10_000)
+        ] = 2000,
     ) -> CallToolResult:
         """Cluster log lines into templates by frequency (enterprise). Mirrors ExtractPatterns."""
         return await run_tool(extract_patterns_impl(deps, stream, window, sample_size))
@@ -532,7 +568,7 @@ def _register_traces_promql(mcp: FastMCP, deps: Deps) -> None:
     async def latest_traces(
         stream: StreamName = "default",
         window: Window = "1h",
-        limit: Annotated[int, Field(ge=1, le=100)] = 20,
+        limit: Annotated[int, Field(description="Maximum traces to return", ge=1, le=100)] = 20,
         filter: Annotated[str, Field(description="SQL condition, e.g. service_name='api'")] = "",
     ) -> CallToolResult:
         """Trace summaries (root service/operation, duration, spans, errors), slowest first.
@@ -582,30 +618,51 @@ def _register_alerts_dashboards(mcp: FastMCP, deps: Deps) -> None:
         alert: Annotated[
             str, Field(description="Alert id (KSUID) or exact name; empty = all")
         ] = "",
-        limit: Annotated[int, Field(ge=1, le=1000)] = 200,
+        limit: Annotated[
+            int, Field(description="Maximum history entries to return", ge=1, le=1000)
+        ] = 200,
     ) -> CallToolResult:
         """Alert evaluations in the window with status counts per alert. Mirrors GetAlertHistory."""
         return await run_tool(alert_history_impl(deps, window, alert, limit))
 
     @tool(annotations=READ_ONLY)
-    async def list_dashboards(folder: str = "", title: str = "") -> CallToolResult:
+    async def list_dashboards(
+        folder: Annotated[
+            str, Field(description="Only dashboards in this folder; empty for the default folder")
+        ] = "",
+        title: Annotated[
+            str, Field(description="Only dashboards whose title contains this text")
+        ] = "",
+    ) -> CallToolResult:
         """Dashboards in the default folder or a given folder/title. Mirrors ListDashboards."""
         return await run_tool(list_dashboards_impl(deps, folder, title))
 
     @tool(annotations=READ_ONLY)
-    async def get_dashboard(dashboard_id: str) -> CallToolResult:
+    async def get_dashboard(
+        dashboard_id: Annotated[
+            str, Field(description="Dashboard id, as returned by list_dashboards")
+        ],
+    ) -> CallToolResult:
         """Dashboard summary: tabs, panels, panel types and queries. Mirrors GetDashboard."""
         return await run_tool(get_dashboard_impl(deps, dashboard_id))
 
     @tool(annotations=READ_ONLY)
     async def list_incidents(
-        window: Window = "7d", status: Literal["", "open", "acknowledged", "resolved"] = ""
+        window: Window = "7d",
+        status: Annotated[
+            Literal["", "open", "acknowledged", "resolved"],
+            Field(description="Only incidents with this status; empty for all"),
+        ] = "",
     ) -> CallToolResult:
         """Correlated alert incidents active in the window (enterprise). Mirrors ListIncidents."""
         return await run_tool(list_incidents_impl(deps, window, status))
 
     @tool(annotations=READ_ONLY)
-    async def get_incident(incident_id: str) -> CallToolResult:
+    async def get_incident(
+        incident_id: Annotated[
+            str, Field(description="Incident id, as returned by list_incidents")
+        ],
+    ) -> CallToolResult:
         """One incident with its correlated triggers (enterprise). Mirrors GetIncident."""
         return await run_tool(get_incident_impl(deps, incident_id))
 
@@ -618,15 +675,37 @@ def _register_writes(mcp: FastMCP, deps: Deps) -> None:
         name: Annotated[str, Field(description="snake_case alert name")],
         stream: StreamName,
         sql: Annotated[str, Field(description="SELECT whose result rows trigger the alert")],
-        destinations: Annotated[list[str], Field(min_length=1)],
-        stream_type: StreamKind = "logs",
-        period_minutes: Annotated[int, Field(ge=1, le=10_080)] = 10,
-        frequency_minutes: Annotated[int, Field(ge=1, le=10_080)] = 10,
-        threshold: Annotated[int, Field(ge=0)] = 1,
-        operator: Literal["=", "!=", ">", ">=", "<", "<="] = ">=",
-        silence_minutes: Annotated[int, Field(ge=0)] = 60,
-        description: str = "",
-        folder: str = "",
+        destinations: Annotated[
+            list[str],
+            Field(
+                description="Names of alert destinations that receive the notification",
+                min_length=1,
+            ),
+        ],
+        stream_type: Annotated[
+            StreamKind, Field(description="Stream type the SQL reads: logs, traces or metrics")
+        ] = "logs",
+        period_minutes: Annotated[
+            int,
+            Field(description="Minutes of data each evaluation looks back over", ge=1, le=10_080),
+        ] = 10,
+        frequency_minutes: Annotated[
+            int, Field(description="How often the alert is evaluated, in minutes", ge=1, le=10_080)
+        ] = 10,
+        threshold: Annotated[
+            int, Field(description="Row count that operator compares the result against", ge=0)
+        ] = 1,
+        operator: Annotated[
+            Literal["=", "!=", ">", ">=", "<", "<="],
+            Field(description="How the result row count is compared with threshold"),
+        ] = ">=",
+        silence_minutes: Annotated[
+            int, Field(description="Minutes to stay quiet after the alert fires", ge=0)
+        ] = 60,
+        description: Annotated[str, Field(description="Description shown with the alert")] = "",
+        folder: Annotated[
+            str, Field(description="Alert folder; empty for the default folder")
+        ] = "",
         dry_run: DryRun = True,
     ) -> CallToolResult:
         """Create a scheduled SQL alert. Dry run by default; sends only with dry_run=false AND
@@ -648,13 +727,15 @@ def _register_writes(mcp: FastMCP, deps: Deps) -> None:
 
     @tool(annotations=WRITE)
     async def create_dashboard(
-        title: str,
-        description: str = "",
+        title: Annotated[str, Field(description="Dashboard title")],
+        description: Annotated[str, Field(description="Dashboard description")] = "",
         tabs: Annotated[
             list[dict[str, Any]] | None,
             Field(description="v8 tabs with panels; empty = one empty Default tab"),
         ] = None,
-        folder: str = "",
+        folder: Annotated[
+            str, Field(description="Dashboard folder; empty for the default folder")
+        ] = "",
         dry_run: DryRun = True,
     ) -> CallToolResult:
         """Create a dashboard. Dry run by default; sends only with dry_run=false AND

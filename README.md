@@ -129,8 +129,8 @@ I run Claude Code every day, and for months I couldn't tell you how many steps a
 what it cost, or how long it sat waiting for me. Any service in production gets that
 visibility; my agent didn't. This repo is the smallest setup I could find that fixes that: one
 container, a few environment variables, no collector in between. It turned up a number I
-didn't want to see: 43 manual approvals cost me 2 hours 50 minutes in a month. The slow part
-of my agent was me.
+didn't want to see: in seven weeks, Claude Code stopped and waited for me 99 times, 33
+permission prompts and 66 questions it asked me. Six hours. The slow part of my agent was me.
 
 ## Running it next to another OpenObserve
 

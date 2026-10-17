@@ -351,7 +351,7 @@
           "id": "Panel_ID4",
           "type": "metric",
           "title": "Minutes waiting on a human",
-          "description": "Sum of claude_code.tool.blocked_on_user spans",
+          "description": "Time Claude Code sat waiting for you to answer a permission prompt or a question (source=user_temporary). Rule-approved checks are excluded.",
           "config": {
             "show_legends": true,
             "legends_position": null,
@@ -411,7 +411,7 @@
           "queryType": "sql",
           "queries": [
             {
-              "query": "SELECT round(sum(duration)/60000000.0,1) AS y_axis_1 FROM \"claude_code\" WHERE operation_name='claude_code.tool.blocked_on_user'",
+              "query": "SELECT round(sum(duration)/60000000.0,1) AS y_axis_1 FROM \"claude_code\" WHERE operation_name='claude_code.tool.blocked_on_user' AND source='user_temporary'",
               "vrlFunctionQuery": "",
               "customQuery": true,
               "fields": {

@@ -11,7 +11,7 @@ actually does when you give it a task: every model call, every tool it runs, how
 it waiting, and what it cost. When you're ready, connect your own Claude Code and watch your
 real sessions.
 
-![One agent task as a trace: model calls, tools, a helper agent, and time spent waiting for you](docs/images/trace-waterfall-subagent.jpg)
+![How the playground fits together: Claude Code, example data or your app send OTLP to one OpenObserve container, which you read in the browser](docs/images/how-it-fits.png)
 
 ## Try it in one command
 
@@ -24,7 +24,7 @@ make quickstart
 ```
 
 That's it. `make quickstart` checks your machine, creates `.env` with a generated password
-(it prints the login), starts OpenObserve, loads 6 hours of example agent activity plus three
+(it prints the login), starts OpenObserve, loads 6 hours of example agent activity plus four
 dashboards, and opens **<http://localhost:5080>**. Log in and go to **Traces**.
 
 About two minutes on a first run, most of it pulling the 620 MB OpenObserve image once. After
@@ -34,6 +34,29 @@ Prefer the steps one by one? `make doctor`, `make up`, `make demo`, `make open`.
 
 > The example data is made up. It looks exactly like real Claude Code data, so everything
 > works the same way. Nothing leaves your machine.
+
+## Or let your AI assistant set it up
+
+If you use Claude Code, Codex, Cursor, Gemini CLI or Copilot, it can do all of this for you.
+The repo has an [AGENTS.md](AGENTS.md) with the exact steps, the checks after each one, and the
+things it must ask you before doing. Clone the repo, open your assistant in the folder, and paste:
+
+```text
+Set up this playground for me by following AGENTS.md. I'm new to OpenTelemetry and
+OpenObserve, so explain each step in a sentence as you go, and ask me before anything that
+changes files outside this repo.
+```
+
+In Claude Code, `/setup` does the same thing.
+
+Using a chat assistant that can't run commands, like ChatGPT or claude.ai? Paste this instead,
+and it will walk you through it one step at a time:
+
+```text
+Walk me through setting up https://github.com/Iamrushabhshahh/openobserve-playground on my
+laptop. Follow the steps in its AGENTS.md file. Give me one command at a time, tell me what it
+does and what I should see, and wait for me to paste the output before the next step.
+```
 
 ## What to look at
 
@@ -46,10 +69,10 @@ how many steps it had, and whether something failed.
 tool, or waiting for you to say "yes". Steps inside steps show a helper agent at work, or a
 call that went out to another service.
 
-![A trace that crosses into an MCP server and GitHub](docs/images/trace-waterfall-mcp.jpg)
+![One agent task as a trace: model calls, tools, a helper agent, and time spent waiting for you](docs/images/trace-waterfall-subagent.jpg)
 
-**The service graph.** *Traces → Service Graph → Graph View.* A map of everything the agent
-talked to: the AI models, the MCP server, and GitHub behind it.
+**The service graph.** *Traces → Service Graph.* A map of everything the agent talked to: the
+AI model, the MCP server, and GitHub behind it.
 
 ![Service graph](docs/images/service-graph.jpg)
 
@@ -58,8 +81,15 @@ moment, right beside the trace.
 
 ![Logs for a span](docs/images/trace-to-logs.jpg)
 
+**The dashboards.** *Dashboards → Claude Code · Overview.* The headline numbers on one page:
+sessions, cost per session, how often the agent waited for you, latency and subagents. Three
+more dashboards go deeper; they're listed in [claude-code/](claude-code/).
+
+![Claude Code · Overview dashboard](docs/images/dashboard-overview.jpg)
+
 There's a full guided tour, with the queries behind each view, in
-**[docs/tracing-tour.md](docs/tracing-tour.md)**.
+**[docs/tracing-tour.md](docs/tracing-tour.md)**. For what happens between Claude Code and the
+screen, with diagrams, see **[docs/how-it-works.md](docs/how-it-works.md)**.
 
 ## Use your own data
 
@@ -104,6 +134,7 @@ make help        list every command
 ## What's in this folder
 
 ```text
+AGENTS.md            setup steps for AI assistants (CLAUDE.md and GEMINI.md point to it)
 docker-compose.yml   OpenObserve, ready for tracing (plus a tiny alert receiver)
 Makefile             the commands above
 .env.example         copy to .env and set your login
@@ -111,7 +142,7 @@ demo/                makes the example agent data
 claude-code/         connect your real Claude Code, plus its dashboards and alerts
 whoop/               optional extra: my WHOOP health data
 scripts/             small helpers that `make` runs for you
-docs/                tracing tour, settings explained, troubleshooting, screenshots
+docs/                tracing tour, how it works, settings, troubleshooting, screenshots
 ```
 
 ## Extras: my own projects on top

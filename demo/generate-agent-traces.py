@@ -232,6 +232,12 @@ class Task:
                      num_success=1, num_blocking=0)
             t = blocked.end
         else:
+            # Real Claude Code records a short wait span for approvals your settings rules make, too.
+            wait = self.ms(150, 2600)
+            self.batch.spans.append(Span("claude-code", "claude_code.tool.blocked_on_user", self.trace_id, t, t + wait,
+                                         tool.span_id, attributes={"duration_ms": str(wait // MS), "decision": "accept",
+                                                                   "source": "config", "demo.synthetic": True}))
+            t += wait
             self.log(t, tool, "tool_decision", tool_name=tool_name, decision="accept", source="config",
                      tool_use_id=tool_use_id)
 

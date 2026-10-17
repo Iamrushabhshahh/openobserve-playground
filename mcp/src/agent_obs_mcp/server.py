@@ -38,7 +38,7 @@ def build_server(
     agent_tools.register(mcp, deps)
     sre_tools.register(mcp, deps)
     _register_resources(mcp, settings)
-    _register_prompts(mcp)
+    _register_prompts(mcp, deps)
     _register_completions(mcp, deps)
     return mcp
 
@@ -152,11 +152,22 @@ def _register_resources(mcp: FastMCP, settings: Settings) -> None:
         return resources.ABOUT
 
 
-def _register_prompts(mcp: FastMCP) -> None:
-    mcp.prompt(
+def _register_prompts(mcp: FastMCP, deps: Deps) -> None:
+    @mcp.prompt(
         title="Investigate a slow session",
         description="Find where the time and money went in one session",
-    )(prompts.investigate_slow_session)
+    )
+    async def investigate_slow_session(
+        session_id: Annotated[
+            str,
+            Field(
+                description="Claude Code session id, from list_sessions; empty picks the costliest"
+            ),
+        ] = "",
+    ) -> str:
+        picked = None if session_id.strip() else await prompts.costliest_session(deps)
+        return prompts.investigate_slow_session(session_id, picked)
+
     mcp.prompt(
         title="Permission friction audit",
         description="Find permission prompts worth turning into allow rules",

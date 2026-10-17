@@ -3,31 +3,39 @@
 from __future__ import annotations
 
 import re
-from typing import Annotated
+from typing import Annotated, Any
 
 from pydantic import Field
+
+from . import claude_tools
+from .client import O2Error
+from .deps import Deps
 
 _UNSAFE = re.compile(r"[^A-Za-z0-9_.:-]")
 
 
-def investigate_slow_session(
-    session_id: Annotated[
-        str,
-        Field(description="Claude Code session id, from list_sessions; empty picks the costliest"),
-    ] = "",
-) -> str:
+def investigate_slow_session(session_id: str = "", picked: dict[str, Any] | None = None) -> str:
     session_id = _UNSAFE.sub("", session_id)[:128]
     if session_id:
-        pick = f"Investigate why Claude Code session `{session_id}` was slow or expensive."
+        head = f"Investigate why Claude Code session `{session_id}` was slow or expensive."
         sid = session_id
+    elif picked:
+        sid = _UNSAFE.sub("", str(picked["session_id"]))[:128]
+        head = (
+            "No session id was given, so this investigates the most expensive Claude Code "
+            f"session of the last 7 days: `{sid}` (${picked['cost_usd']:.2f}, "
+            f"{picked['llm_calls']} LLM calls, "
+            f"{picked['first_seen']} to {picked['last_seen']}).\n\n"
+            "Start your answer by naming that session and why it was picked."
+        )
     else:
-        pick = (
+        head = (
             "Investigate the most expensive Claude Code session of the last 7 days.\n\n"
             '0. Call `list_sessions` (window "7d", sort "cost", limit 5), take the top row\n'
             "   and say which session_id you picked and why."
         )
         sid = "<that session_id>"
-    return f"""{pick}
+    return f"""{head}
 
 1. Call `list_sessions` (window "30d", sort "duration") and find this session's row:
    cost, LLM calls, tool failures, models, first/last seen.
@@ -38,6 +46,16 @@ def investigate_slow_session(
 4. Report where the time went (LLM vs tool execution vs waiting for permission),
    the critical path, the top self-time spans, and 2–3 concrete fixes
    (allow rules, smaller context, fewer sub-agents, faster tools)."""
+
+
+async def costliest_session(deps: Deps) -> dict[str, Any] | None:
+    """The most expensive session of the last 7 days, or None when OpenObserve can't say."""
+    try:
+        out = await claude_tools.list_sessions(deps, "7d", 1, "cost")
+    except (O2Error, ValueError):
+        return None
+    sessions = out.data.get("sessions") or []
+    return sessions[0] if sessions else None
 
 
 def permission_friction_audit(

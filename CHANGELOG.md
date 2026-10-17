@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 ## [Unreleased]
 
 ### Fixed
+- `/agent-obs:investigate_slow_session` failed when run without a session id, and Claude Code
+  only showed "failed". With no id it now investigates the most expensive session of the last
+  7 days.
 - agent-obs now matches what MCP clients expect: every tool parameter and prompt argument has a
   description (45 parameters had none), prompts and resources have titles, every tool sets
   `openWorldHint: false` because it only talks to the configured OpenObserve, and the server

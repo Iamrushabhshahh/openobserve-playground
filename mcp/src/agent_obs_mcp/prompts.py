@@ -11,15 +11,28 @@ _UNSAFE = re.compile(r"[^A-Za-z0-9_.:-]")
 
 
 def investigate_slow_session(
-    session_id: Annotated[str, Field(description="Claude Code session id, from list_sessions")],
+    session_id: Annotated[
+        str,
+        Field(description="Claude Code session id, from list_sessions; empty picks the costliest"),
+    ] = "",
 ) -> str:
     session_id = _UNSAFE.sub("", session_id)[:128]
-    return f"""Investigate why Claude Code session `{session_id}` was slow or expensive.
+    if session_id:
+        pick = f"Investigate why Claude Code session `{session_id}` was slow or expensive."
+        sid = session_id
+    else:
+        pick = (
+            "Investigate the most expensive Claude Code session of the last 7 days.\n\n"
+            '0. Call `list_sessions` (window "7d", sort "cost", limit 5), take the top row\n'
+            "   and say which session_id you picked and why."
+        )
+        sid = "<that session_id>"
+    return f"""{pick}
 
 1. Call `list_sessions` (window "30d", sort "duration") and find this session's row:
    cost, LLM calls, tool failures, models, first/last seen.
 2. Use `run_readonly_sql` (stream_type "traces") to list its interactions:
-   SELECT trace_id, duration FROM "claude_code" WHERE session_id = '{session_id}'
+   SELECT trace_id, duration FROM "claude_code" WHERE session_id = '{sid}'
    AND operation_name = 'claude_code.interaction' ORDER BY duration DESC
 3. For the two slowest trace_ids call `get_trace_tree` and `subagent_fanout`.
 4. Report where the time went (LLM vs tool execution vs waiting for permission),

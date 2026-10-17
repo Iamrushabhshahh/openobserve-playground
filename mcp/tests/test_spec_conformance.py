@@ -52,3 +52,10 @@ async def test_resources_have_titles_and_types() -> None:
 def test_server_reports_its_own_version_not_the_sdk_version() -> None:
     options = server()._mcp_server.create_initialization_options()
     assert options.server_version == __version__
+
+
+async def test_every_prompt_works_without_arguments() -> None:
+    mcp = server()
+    for prompt in await mcp.list_prompts():
+        result = await mcp.get_prompt(prompt.name, {})
+        assert result.messages, prompt.name

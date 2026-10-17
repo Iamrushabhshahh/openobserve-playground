@@ -44,6 +44,14 @@ jobs:
       - name: Load cached images
         if: steps.images.outputs.cache-hit == 'true'
         run: docker load -i /tmp/images.tar
+      - name: Pick an image this runner can pull
+        run: |
+          scripts/init-env.sh
+          ent="$(docker compose config --images | grep openobserve)"
+          if docker image inspect "$ent" >/dev/null 2>&1 || docker pull -q "$ent"; then exit 0; fi
+          oss="openobserve/openobserve:${ent##*:}"
+          echo "::warning::Public ECR refused $ent (shared runner addresses hit its anonymous data limit). Testing with the open-source build $oss from Docker Hub instead."
+          echo "O2_IMAGE=$oss" >> .env
       - name: Fresh clone to working playground
         run: |
           start=$(date +%s)

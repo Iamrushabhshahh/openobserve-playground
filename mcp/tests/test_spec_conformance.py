@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import httpx
 import pytest
-from conftest import TEST_ENV
+from conftest import NOW_S, TEST_ENV, FakeO2
 
 from agent_obs_mcp import __version__
 from agent_obs_mcp.config import load_settings
@@ -52,3 +53,31 @@ async def test_resources_have_titles_and_types() -> None:
 def test_server_reports_its_own_version_not_the_sdk_version() -> None:
     options = server()._mcp_server.create_initialization_options()
     assert options.server_version == __version__
+
+
+async def test_every_prompt_works_without_arguments() -> None:
+    mcp = server()
+    for prompt in await mcp.list_prompts():
+        result = await mcp.get_prompt(prompt.name, {})
+        assert result.messages, prompt.name
+
+
+async def test_slow_session_prompt_names_the_session_it_picked() -> None:
+    row = {
+        "session_id": "sess-costly",
+        "cost_usd": 12.5,
+        "llm_calls": 40,
+        "first_seen": 1_791_400_000_000_000,
+        "last_seen": 1_791_403_600_000_000,
+        "span_us": 3_600_000_000,
+    }
+    fake = FakeO2(
+        [
+            ("COUNT(*) AS n", [{"session_id": "sess-costly", "model": "m", "n": 1}]),
+            ("cost_usd", [row]),
+        ]
+    )
+    mcp = build_server(load_settings(TEST_ENV), httpx.MockTransport(fake), clock=lambda: NOW_S)
+    text = (await mcp.get_prompt("investigate_slow_session", {})).messages[0].content.text
+    assert "most expensive" in text and "`sess-costly`" in text and "$12.50" in text
+    assert "session_id = 'sess-costly'" in text

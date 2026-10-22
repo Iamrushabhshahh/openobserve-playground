@@ -4,6 +4,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+### Changed
+- Claude Code · Overview: the two subagent tiles share a row at half width, and the waits table
+  (permission prompts vs questions) gets its own full-width row instead of being squeezed in
+  next to them.
+
 ### Fixed
 - `/agent-obs:investigate_slow_session` failed when run without a session id, and Claude Code
   only showed "failed". With no id it now looks up the most expensive session of the last 7
